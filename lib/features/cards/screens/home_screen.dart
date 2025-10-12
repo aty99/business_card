@@ -5,9 +5,7 @@ import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/animated_page_route.dart';
 import '../../../utils/custom_snackbar.dart';
-import '../../../core/widgets/custom_app_bar.dart';
 import '../../../core/widgets/animated_card.dart';
-import '../../../core/widgets/empty_state_widget.dart';
 import '../../../core/widgets/loading_widget.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../auth/bloc/auth_bloc.dart';
@@ -58,27 +56,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  void _searchCards(String query) {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is Authenticated) {
-      context.read<CardBloc>().add(SearchCards(authState.user.id, query));
-    }
-  }
-
-  void _navigateToAddCard(BuildContext context) {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is Authenticated) {
-      Navigator.push(
-        context,
-        SlideFadePageRoute(
-          page: BlocProvider.value(
-            value: context.read<CardBloc>(),
-            child: AddCardScreen(userId: authState.user.id),
-          ),
-        ),
-      );
-    }
-  }
 
   void _navigateToCardDetail(BuildContext context, BusinessCardModel card) {
     Navigator.push(
@@ -269,208 +246,198 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: CustomAppBar(
-        title: AppStrings.myCards.tr(),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
-        showBackButton: false,
-        actions: [
-          BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, authState) {
-              if (authState is Authenticated) {
-                return PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert),
-                  onSelected: (value) {
-                    if (value == 'logout') {
-                      _showLogoutDialog(context);
-                    } else if (value == 'language') {
-                      // Toggle language
-                      if (context.locale == const Locale('en')) {
-                        context.setLocale(const Locale('ar'));
-                      } else {
-                        context.setLocale(const Locale('en'));
-                      }
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'profile',
-                      enabled: false,
-                      child: Row(
-                        children: [
-                          const Icon(Icons.person, color: AppColors.textPrimary),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  authState.user.fullName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  authState.user.email,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Search button on the left
+            IconButton(
+              icon: Icon(
+                Icons.search,
+                color: AppColors.textPrimary,
+                size: 24,
+              ),
+              onPressed: () {
+                // Focus on search field or show search dialog
+                FocusScope.of(context).requestFocus(FocusNode());
+                _searchController.clear();
+              },
+            ),
+            const Spacer(),
+            // Business Code logo in center
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Business',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
                       ),
                     ),
-                    const PopupMenuDivider(),
-                    PopupMenuItem(
-                      value: 'language',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.language, color: AppColors.primary),
-                          const SizedBox(width: 12),
-                          Text('language'.tr()),
-                          const Spacer(),
-                          Text(
-                            context.locale == const Locale('ar') ? 'English' : 'العربية',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(4),
                       ),
-                    ),
-                    const PopupMenuDivider(),
-                    PopupMenuItem(
-                      value: 'logout',
-                      child: Row(
-                        children: [
-                          const Icon(Icons.logout, color: AppColors.error),
-                          const SizedBox(width: 12),
-                          Text('sign_out'.tr()),
-                        ],
+                      child: Icon(
+                        Icons.code,
+                        color: Colors.white,
+                        size: 16,
                       ),
                     ),
                   ],
-                );
-              }
-              return const SizedBox();
-            },
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Search bar
-          Container(
-            color: AppColors.primary,
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _searchCards,
-                style: const TextStyle(
-                  color: AppColors.white,
-                  fontSize: 16,
                 ),
-                decoration: InputDecoration(
-                  hintText: 'search'.tr(),
-                  hintStyle: TextStyle(
-                    color: AppColors.white.withValues(alpha: 0.7),
+                Text(
+                  'Code',
+                  style: TextStyle(
                     fontSize: 16,
-                  ),
-                  prefixIcon: Container(
-                    padding: const EdgeInsets.all(12),
-                    child: const Icon(
-                      Icons.search_rounded,
-                      color: AppColors.white,
-                      size: 20,
-                    ),
-                  ),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(
-                            Icons.clear_rounded,
-                            color: AppColors.white,
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            _searchController.clear();
-                            _loadCards();
-                          },
-                        )
-                      : null,
-                  filled: true,
-                  fillColor: Colors.white.withValues(alpha: 0.15),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
                   ),
                 ),
-              ),
+              ],
             ),
-          ),
-
-          // Cards list
-          Expanded(
-            child: BlocConsumer<CardBloc, CardState>(
-              listener: (context, state) {
-                if (state is CardError) {
-                  context.showErrorSnackBar(state.message);
-                } else if (state is CardAdded) {
-                  context.showSuccessSnackBar('Card saved successfully!');
-                } else if (state is CardUpdated) {
-                  context.showSuccessSnackBar('Card updated successfully!');
-                } else if (state is CardDeleted) {
-                  context.showSuccessSnackBar('Card deleted successfully!');
-                }
-              },
-              builder: (context, state) {
-                if (state is CardLoading) {
-                  return context.loadingIndicator(
-                    message: AppStrings.loadingMessage.tr(),
+            const Spacer(),
+            // Menu button on the right
+            BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, authState) {
+                if (authState is Authenticated) {
+                  return PopupMenuButton<String>(
+                    icon: Icon(
+                      Icons.menu,
+                      color: AppColors.textPrimary,
+                      size: 24,
+                    ),
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        _showLogoutDialog(context);
+                      } else if (value == 'language') {
+                        // Toggle language
+                        if (context.locale == const Locale('en')) {
+                          context.setLocale(const Locale('ar'));
+                        } else {
+                          context.setLocale(const Locale('en'));
+                        }
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'profile',
+                        enabled: false,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.person, color: AppColors.textPrimary),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    authState.user.fullName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    authState.user.email,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                        value: 'language',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.language, color: AppColors.primary),
+                            const SizedBox(width: 12),
+                            Text('language'.tr()),
+                            const Spacer(),
+                            Text(
+                              context.locale == const Locale('ar') ? 'English' : 'العربية',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const PopupMenuDivider(),
+                      PopupMenuItem(
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.logout, color: AppColors.error),
+                            const SizedBox(width: 12),
+                            Text('sign_out'.tr()),
+                          ],
+                        ),
+                      ),
+                    ],
                   );
                 }
-
-                if (state is CardEmpty) {
-                  return context.noCardsEmptyState(
-                    onAddCard: () => _navigateToAddCard(context),
-                  );
-                }
-
-                if (state is CardLoaded) {
-                  return _buildCardsList(state.cards);
-                }
-
-                return _buildEmptyState();
+                return const SizedBox();
               },
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+      body: BlocConsumer<CardBloc, CardState>(
+        listener: (context, state) {
+          if (state is CardError) {
+            context.showErrorSnackBar(state.message);
+          } else if (state is CardAdded) {
+            context.showSuccessSnackBar('Card saved successfully!');
+          } else if (state is CardUpdated) {
+            context.showSuccessSnackBar('Card updated successfully!');
+          } else if (state is CardDeleted) {
+            context.showSuccessSnackBar('Card deleted successfully!');
+          }
+        },
+        builder: (context, state) {
+          if (state is CardLoading) {
+            return context.loadingIndicator(
+              message: AppStrings.loadingMessage.tr(),
+            );
+          }
+
+          if (state is CardEmpty) {
+            return _buildEmptyState();
+          }
+
+          if (state is CardLoaded) {
+            return _buildCardsList(state.cards);
+          }
+
+          return _buildEmptyState();
+        },
       ),
       floatingActionButton: ScaleTransition(
         scale: _fabScaleAnimation,
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
+            shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
                 color: AppColors.primary.withOpacity(0.3),
@@ -479,7 +446,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-          child: FloatingActionButton.extended(
+          child: FloatingActionButton(
             onPressed: _isAddingCard ? null : () async {
               setState(() {
                 _isAddingCard = true;
@@ -517,7 +484,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             elevation: 0,
-            icon: _isAddingCard
+            child: _isAddingCard
                 ? SizedBox(
                     width: 24,
                     height: 24,
@@ -526,19 +493,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
-                : const Icon(
-                    Icons.add_rounded,
-                    size: 24,
+                : Icon(
+                    Icons.qr_code_scanner_rounded,
+                    size: 28,
                   ),
-            label: Text(
-              _isAddingCard ? 'Adding...' : 'add_card'.tr(),
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
-            ),
-            heroTag: 'add_card_fab',
+            heroTag: 'scan_card_fab',
           ),
         ),
       ),
@@ -563,90 +522,149 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Animated icon with gradient background
+            // Stacked cards animation
             TweenAnimationBuilder<double>(
               tween: Tween(begin: 0.0, end: 1.0),
-              duration: const Duration(milliseconds: 1000),
-              curve: Curves.elasticOut,
+              duration: const Duration(milliseconds: 1200),
+              curve: Curves.easeOutBack,
               builder: (context, value, child) {
                 return Transform.scale(
                   scale: value,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.primary.withValues(alpha: 0.1),
-                          AppColors.primary.withValues(alpha: 0.05),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.credit_card_off_rounded,
-                        size: 60,
-                        color: AppColors.primary.withValues(alpha: 0.6),
-                      ),
-                    ),
+                  child: Transform.rotate(
+                    angle: value * 0.1, // Slight rotation
+                    child: child,
                   ),
                 );
               },
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Background card (gray)
+                  Transform.translate(
+                    offset: const Offset(8, 8),
+                    child: Container(
+                      width: 200,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: AppColors.lightGrey,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 16),
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: AppColors.grey,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            width: 60,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: AppColors.grey,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            width: 80,
+                            height: 4,
+                            decoration: BoxDecoration(
+                              color: AppColors.grey,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Front card (white with teal border)
+                  Container(
+                    width: 200,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(right: 16),
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Icon(
+                                Icons.qr_code,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Container(
+                          width: 60,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: AppColors.textSecondary,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          width: 80,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: AppColors.textSecondary,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
             
-            // Title with better styling
+            // Arabic text "لا يوجد بطاقات"
             Text(
-              'no_cards'.tr(),
+              'لا يوجد بطاقات',
               style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
                 color: AppColors.textPrimary,
                 letterSpacing: -0.5,
-              ),
-            ),
-            const SizedBox(height: 12),
-            
-            // Description with better styling
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Text(
-                'no_cards_description'.tr(),
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textSecondary,
-                  height: 1.5,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            
-            const SizedBox(height: 32),
-            
-            // Decorative dots
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                3,
-                (index) => Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                  ),
-                ),
               ),
             ),
           ],

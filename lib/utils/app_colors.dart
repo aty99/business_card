@@ -3,23 +3,23 @@ import 'package:flutter/material.dart';
 /// Application color scheme
 class AppColors {
   // Primary colors
-  static const Color primary = Color(0xFF6C63FF);
-  static const Color primaryDark = Color(0xFF5A52D5);
-  static const Color primaryLight = Color(0xFF8B84FF);
+  static const Color primary = Color(0xFF26A69A); // Teal color from image
+  static const Color primaryDark = Color(0xFF1E8B7F);
+  static const Color primaryLight = Color(0xFF4DB6AC);
   
   // Secondary colors
-  static const Color secondary = Color(0xFF00D4FF);
-  static const Color secondaryDark = Color(0xFF00B8E6);
+  static const Color secondary = Color(0xFF81C784); // Light green from image
+  static const Color secondaryDark = Color(0xFF66BB6A);
   
   // Background colors
-  static const Color background = Color(0xFFF5F7FA);
+  static const Color background = Colors.white; // Pure white like in image
   static const Color cardBackground = Colors.white;
   static const Color darkBackground = Color(0xFF1A1A2E);
   
   // Text colors
-  static const Color textPrimary = Color(0xFF2D3436);
-  static const Color textSecondary = Color(0xFF636E72);
-  static const Color textLight = Color(0xFF95A5A6);
+  static const Color textPrimary = Color(0xFF212121); // Darker for white background
+  static const Color textSecondary = Color(0xFF757575); // Medium gray
+  static const Color textLight = Color(0xFFBDBDBD); // Light gray
   
   // Status colors
   static const Color success = Color(0xFF00B894);
