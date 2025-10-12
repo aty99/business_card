@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/validators.dart';
+import '../../../utils/custom_snackbar.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -77,19 +78,9 @@ class _SignUpScreenState extends State<SignUpScreen>
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            context.showErrorSnackBar(state.message);
           } else if (state is Authenticated) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Account created successfully!'),
-                backgroundColor: AppColors.success,
-              ),
-            );
+            context.showSuccessSnackBar('Account created successfully!');
             Navigator.pop(context);
           }
         },

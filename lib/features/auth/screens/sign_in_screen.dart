@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/validators.dart';
 import '../../../utils/animated_page_route.dart';
+import '../../../utils/custom_snackbar.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -63,12 +64,7 @@ class _SignInScreenState extends State<SignInScreen>
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.error,
-              ),
-            );
+            context.showErrorSnackBar(state.message);
           }
         },
         builder: (context, state) {

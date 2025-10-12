@@ -6,6 +6,7 @@ import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/animated_page_route.dart';
 import '../../../utils/image_storage.dart';
+import '../../../utils/custom_snackbar.dart';
 import '../bloc/card_bloc.dart';
 import '../bloc/card_event.dart';
 import 'add_card_screen.dart';
@@ -29,6 +30,7 @@ class _CardDetailScreenState extends State<CardDetailScreen>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   bool _isDeleting = false;
+  bool _isCopying = false;
 
   @override
   void initState() {
@@ -64,15 +66,29 @@ class _CardDetailScreenState extends State<CardDetailScreen>
     super.dispose();
   }
 
-  void _copyToClipboard(BuildContext context, String text, String label) {
-    Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$label copied to clipboard'),
-        backgroundColor: AppColors.success,
-        duration: const Duration(seconds: 2),
-      ),
-    );
+  void _copyToClipboard(BuildContext context, String text, String label) async {
+    if (_isCopying) return;
+    
+    setState(() {
+      _isCopying = true;
+    });
+    
+    try {
+      await Clipboard.setData(ClipboardData(text: text));
+      if (mounted) {
+        context.showSuccessSnackBar('$label copied to clipboard');
+      }
+    } catch (e) {
+      if (mounted) {
+        context.showErrorSnackBar('Failed to copy $label');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCopying = false;
+        });
+      }
+    }
   }
 
   void _deleteCard(BuildContext context) {
@@ -114,24 +130,14 @@ class _CardDetailScreenState extends State<CardDetailScreen>
                       if (mounted) {
                         Navigator.pop(dialogContext);
                         Navigator.pop(context, true);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Card deleted successfully'),
-                            backgroundColor: AppColors.success,
-                          ),
-                        );
+                        context.showSuccessSnackBar('Card deleted successfully');
                       }
                     } catch (e) {
                       if (mounted) {
                         setDialogState(() {
                           _isDeleting = false;
                         });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error deleting card: $e'),
-                            backgroundColor: AppColors.error,
-                          ),
-                        );
+                        context.showErrorSnackBar('Error deleting card: $e');
                       }
                     }
                   },
@@ -462,11 +468,20 @@ class _CardDetailScreenState extends State<CardDetailScreen>
                   ],
                 ),
               ),
-              const Icon(
-                Icons.copy,
-                size: 20,
-                color: AppColors.primary,
-              ),
+              _isCopying
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      ),
+                    )
+                  : const Icon(
+                      Icons.copy,
+                      size: 20,
+                      color: AppColors.primary,
+                    ),
             ],
           ),
         ),

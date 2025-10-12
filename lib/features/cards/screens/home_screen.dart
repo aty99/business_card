@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/animated_page_route.dart';
+import '../../../utils/custom_snackbar.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_event.dart';
 import '../../auth/bloc/auth_state.dart';
@@ -403,19 +404,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: BlocConsumer<CardBloc, CardState>(
               listener: (context, state) {
                 if (state is CardError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.message),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
+                  context.showErrorSnackBar(state.message);
                 } else if (state is CardAdded) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Card saved successfully!'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
+                  context.showSuccessSnackBar('Card saved successfully!');
+                } else if (state is CardUpdated) {
+                  context.showSuccessSnackBar('Card updated successfully!');
+                } else if (state is CardDeleted) {
+                  context.showSuccessSnackBar('Card deleted successfully!');
                 }
               },
               builder: (context, state) {

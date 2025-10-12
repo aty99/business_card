@@ -7,6 +7,7 @@ import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/validators.dart';
 import '../../../utils/image_storage.dart';
+import '../../../utils/custom_snackbar.dart';
 import '../bloc/card_bloc.dart';
 import '../bloc/card_event.dart';
 
@@ -29,6 +30,7 @@ class _AddCardScreenState extends State<AddCardScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
+  bool _isScanning = false;
   final _fullNameController = TextEditingController();
   final _companyNameController = TextEditingController();
   final _jobTitleController = TextEditingController();
@@ -83,6 +85,12 @@ class _AddCardScreenState extends State<AddCardScreen>
   }
 
   Future<void> _scanCard() async {
+    if (_isScanning) return;
+    
+    setState(() {
+      _isScanning = true;
+    });
+    
     final ImagePicker picker = ImagePicker();
     
     // Show dialog to choose camera or gallery
@@ -130,22 +138,18 @@ class _AddCardScreenState extends State<AddCardScreen>
         _fillMockData();
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Card scanned! Please verify the details.'),
-              backgroundColor: AppColors.success,
-            ),
-          );
+        context.showSuccessSnackBar('Card scanned! Please verify the details.');
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        context.showErrorSnackBar('Error: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isScanning = false;
+        });
       }
     }
   }
@@ -177,12 +181,7 @@ class _AddCardScreenState extends State<AddCardScreen>
 
   void _saveCard() async {
     if (!_isScanned) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please scan a card first'),
-          backgroundColor: AppColors.warning,
-        ),
-      );
+      context.showWarningSnackBar('Please scan a card first');
       return;
     }
     
@@ -216,12 +215,7 @@ class _AddCardScreenState extends State<AddCardScreen>
         Navigator.pop(context, true);
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error saving card: $e'),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          context.showErrorSnackBar('Error saving card: $e');
         }
       } finally {
         if (mounted) {
@@ -257,7 +251,7 @@ class _AddCardScreenState extends State<AddCardScreen>
             // Scan card button/preview
             if (!_isScanned)
               InkWell(
-                onTap: _scanCard,
+                onTap: _isScanning ? null : _scanCard,
                 child: Container(
                   height: 200,
                   decoration: BoxDecoration(
@@ -269,27 +263,36 @@ class _AddCardScreenState extends State<AddCardScreen>
                       style: BorderStyle.solid,
                     ),
                   ),
-                  child: const Column(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.camera_alt,
-                        size: 64,
-                        color: AppColors.primary,
-                      ),
-                      SizedBox(height: 16),
+                      _isScanning
+                          ? SizedBox(
+                              width: 64,
+                              height: 64,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                              ),
+                            )
+                          : const Icon(
+                              Icons.camera_alt,
+                              size: 64,
+                              color: AppColors.primary,
+                            ),
+                      const SizedBox(height: 16),
                       Text(
-                        'Tap to Scan Business Card',
-                        style: TextStyle(
+                        _isScanning ? 'Scanning...' : 'Tap to Scan Business Card',
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        'Use camera or select from gallery',
-                        style: TextStyle(
+                        _isScanning ? 'Please wait while we process your card' : 'Use camera or select from gallery',
+                        style: const TextStyle(
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -323,13 +326,22 @@ class _AddCardScreenState extends State<AddCardScreen>
                     Positioned(
                       top: 8,
                       right: 8,
-                      child: IconButton(
-                        icon: const Icon(Icons.camera_alt),
+                      child:                       IconButton(
+                        icon: _isScanning
+                            ? SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+                                ),
+                              )
+                            : const Icon(Icons.camera_alt),
                         color: AppColors.white,
                         style: IconButton.styleFrom(
                           backgroundColor: AppColors.primary,
                         ),
-                        onPressed: _scanCard,
+                        onPressed: _isScanning ? null : _scanCard,
                       ),
                     ),
                   ],
