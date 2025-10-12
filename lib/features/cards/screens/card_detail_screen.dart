@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/animated_page_route.dart';
+import '../../../utils/image_storage.dart';
 import '../bloc/card_bloc.dart';
 import '../bloc/card_event.dart';
 import 'add_card_screen.dart';
@@ -93,7 +94,12 @@ class _CardDetailScreenState extends State<CardDetailScreen>
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                // Delete the image file if it exists
+                if (widget.card.imagePath != null) {
+                  await ImageStorage.deleteImage(widget.card.imagePath!);
+                }
+                
                 context.read<CardBloc>().add(DeleteCard(widget.card.id));
                 Navigator.pop(dialogContext);
                 Navigator.pop(context, true);
@@ -163,7 +169,7 @@ class _CardDetailScreenState extends State<CardDetailScreen>
                           child: Icon(
                             Icons.credit_card,
                             size: 80,
-                            color: AppColors.white.withValues(alpha: 0.5),
+                            color: AppColors.primary.withValues(alpha: 0.7),
                           ),
                         ),
                 ),
@@ -171,11 +177,11 @@ class _CardDetailScreenState extends State<CardDetailScreen>
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.edit),
+                icon: const Icon(Icons.edit, color: AppColors.white),
                 onPressed: () => _editCard(context),
               ),
               IconButton(
-                icon: const Icon(Icons.delete),
+                icon: const Icon(Icons.delete, color: AppColors.white),
                 onPressed: () => _deleteCard(context),
               ),
             ],
@@ -414,7 +420,7 @@ class _CardDetailScreenState extends State<CardDetailScreen>
               const Icon(
                 Icons.copy,
                 size: 20,
-                color: AppColors.grey,
+                color: AppColors.primary,
               ),
             ],
           ),

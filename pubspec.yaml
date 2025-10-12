@@ -57,6 +57,9 @@ dependencies:
   
   # Localization
   easy_localization: ^3.0.7
+  
+  # File Storage
+  path_provider: ^2.1.1 # For permanent image storage
 
 dev_dependencies:
   flutter_test:

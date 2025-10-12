@@ -69,8 +69,22 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     Emitter<CardState> emit,
   ) async {
     try {
+      // Get the current user ID from the current state
+      final currentState = state;
+      String? userId;
+      
+      if (currentState is CardLoaded) {
+        // Get userId from the first card (all cards belong to same user)
+        userId = currentState.cards.isNotEmpty ? currentState.cards.first.userId : null;
+      }
+      
       await cardRepository.deleteCard(event.cardId);
       emit(const CardDeleted());
+      
+      // Reload cards after deleting if we have a userId
+      if (userId != null) {
+        add(LoadCards(userId));
+      }
     } catch (e) {
       emit(CardError(e.toString()));
     }

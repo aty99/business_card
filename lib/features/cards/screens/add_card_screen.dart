@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/validators.dart';
+import '../../../utils/image_storage.dart';
 import '../bloc/card_bloc.dart';
 import '../bloc/card_event.dart';
 
@@ -116,8 +117,11 @@ class _AddCardScreenState extends State<AddCardScreen>
       );
 
       if (image != null) {
+        // Save image to permanent storage
+        final String permanentPath = await ImageStorage.saveImage(image.path);
+        
         setState(() {
-          _imagePath = image.path;
+          _imagePath = permanentPath;
           _isScanned = true;
         });
 
