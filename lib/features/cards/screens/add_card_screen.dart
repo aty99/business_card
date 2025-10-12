@@ -24,7 +24,8 @@ class AddCardScreen extends StatefulWidget {
   State<AddCardScreen> createState() => _AddCardScreenState();
 }
 
-class _AddCardScreenState extends State<AddCardScreen> {
+class _AddCardScreenState extends State<AddCardScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
   final _companyNameController = TextEditingController();
@@ -36,10 +37,23 @@ class _AddCardScreenState extends State<AddCardScreen> {
 
   String? _imagePath;
   bool _isScanned = false;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+    _animationController.forward();
+    
     if (widget.card != null) {
       _fullNameController.text = widget.card!.fullName;
       _companyNameController.text = widget.card!.companyName;
@@ -62,6 +76,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
     _phoneController.dispose();
     _websiteController.dispose();
     _addressController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -200,11 +215,13 @@ class _AddCardScreenState extends State<AddCardScreen> {
         foregroundColor: AppColors.white,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             // Scan card button/preview
             if (!_isScanned)
               InkWell(
@@ -375,6 +392,7 @@ class _AddCardScreenState extends State<AddCardScreen> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

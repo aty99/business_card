@@ -4,18 +4,63 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
+import '../../../utils/animated_page_route.dart';
 import '../bloc/card_bloc.dart';
 import '../bloc/card_event.dart';
 import 'add_card_screen.dart';
 
 /// Screen to view and manage a single business card
-class CardDetailScreen extends StatelessWidget {
+class CardDetailScreen extends StatefulWidget {
   final BusinessCardModel card;
 
   const CardDetailScreen({
     Key? key,
     required this.card,
   }) : super(key: key);
+
+  @override
+  State<CardDetailScreen> createState() => _CardDetailScreenState();
+}
+
+class _CardDetailScreenState extends State<CardDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
+
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   void _copyToClipboard(BuildContext context, String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
@@ -31,35 +76,41 @@ class CardDetailScreen extends StatelessWidget {
   void _deleteCard(BuildContext context) {
     showDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Card'),
-        content: const Text('Are you sure you want to delete this card?'),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+      builder: (dialogContext) => ScaleTransition(
+        scale: CurvedAnimation(
+          parent: _animationController,
+          curve: Curves.easeOutBack,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+        child: AlertDialog(
+          title: const Text('Delete Card'),
+          content: const Text('Are you sure you want to delete this card?'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          TextButton(
-            onPressed: () {
-              context.read<CardBloc>().add(DeleteCard(card.id));
-              Navigator.pop(dialogContext);
-              Navigator.pop(context, true);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Card deleted successfully'),
-                  backgroundColor: AppColors.success,
-                ),
-              );
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.error,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
             ),
-            child: const Text('Delete'),
-          ),
-        ],
+            TextButton(
+              onPressed: () {
+                context.read<CardBloc>().add(DeleteCard(widget.card.id));
+                Navigator.pop(dialogContext);
+                Navigator.pop(context, true);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Card deleted successfully'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.error,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -67,12 +118,12 @@ class CardDetailScreen extends StatelessWidget {
   void _editCard(BuildContext context) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
+      ScalePageRoute(
+        page: BlocProvider.value(
           value: context.read<CardBloc>(),
           child: AddCardScreen(
-            userId: card.userId,
-            card: card,
+            userId: widget.card.userId,
+            card: widget.card,
           ),
         ),
       ),
@@ -95,24 +146,27 @@ class CardDetailScreen extends StatelessWidget {
             backgroundColor: AppColors.primary,
             foregroundColor: AppColors.white,
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: card.imagePath != null
-                      ? null
-                      : AppColors.primaryGradient,
-                ),
-                child: card.imagePath != null
-                    ? Image.file(
-                        File(card.imagePath!),
-                        fit: BoxFit.cover,
-                      )
-                    : Center(
-                        child: Icon(
-                          Icons.credit_card,
-                          size: 80,
-                          color: AppColors.white.withValues(alpha: 0.5),
+              background: Hero(
+                tag: 'card_${widget.card.id}',
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: widget.card.imagePath != null
+                        ? null
+                        : AppColors.primaryGradient,
+                  ),
+                  child: widget.card.imagePath != null
+                      ? Image.file(
+                          File(widget.card.imagePath!),
+                          fit: BoxFit.cover,
+                        )
+                      : Center(
+                          child: Icon(
+                            Icons.credit_card,
+                            size: 80,
+                            color: AppColors.white.withValues(alpha: 0.5),
+                          ),
                         ),
-                      ),
+                ),
               ),
             ),
             actions: [
@@ -129,63 +183,70 @@ class CardDetailScreen extends StatelessWidget {
 
           // Content
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name and title
-                  Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            card.fullName,
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name and title
+                      _AnimatedCard(
+                        delay: 0,
+                        child: Card(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            card.jobTitle,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.business,
-                                size: 18,
-                                color: AppColors.primary,
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  card.companyName,
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.card.fullName,
                                   style: const TextStyle(
-                                    fontSize: 16,
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textPrimary,
                                   ),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 8),
+                                Text(
+                                  widget.card.jobTitle,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.business,
+                                      size: 18,
+                                      color: AppColors.primary,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        widget.card.companyName,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
                   const SizedBox(height: 16),
 
                   // Contact information
@@ -197,79 +258,96 @@ class CardDetailScreen extends StatelessWidget {
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                  _buildContactCard(
-                    context,
-                    icon: Icons.email,
-                    label: 'Email',
-                    value: card.email,
-                    onTap: () => _copyToClipboard(context, card.email, 'Email'),
-                  ),
-                  const SizedBox(height: 12),
+                      _AnimatedCard(
+                        delay: 100,
+                        child: _buildContactCard(
+                          context,
+                          icon: Icons.email,
+                          label: 'Email',
+                          value: widget.card.email,
+                          onTap: () => _copyToClipboard(context, widget.card.email, 'Email'),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
 
-                  _buildContactCard(
-                    context,
-                    icon: Icons.phone,
-                    label: 'Phone',
-                    value: card.phone,
-                    onTap: () => _copyToClipboard(context, card.phone, 'Phone'),
-                  ),
+                      _AnimatedCard(
+                        delay: 200,
+                        child: _buildContactCard(
+                          context,
+                          icon: Icons.phone,
+                          label: 'Phone',
+                          value: widget.card.phone,
+                          onTap: () => _copyToClipboard(context, widget.card.phone, 'Phone'),
+                        ),
+                      ),
 
-                  if (card.website != null) ...[
-                    const SizedBox(height: 12),
-                    _buildContactCard(
-                      context,
-                      icon: Icons.language,
-                      label: 'Website',
-                      value: card.website!,
-                      onTap: () =>
-                          _copyToClipboard(context, card.website!, 'Website'),
-                    ),
-                  ],
+                      if (widget.card.website != null) ...[
+                        const SizedBox(height: 12),
+                        _AnimatedCard(
+                          delay: 300,
+                          child: _buildContactCard(
+                            context,
+                            icon: Icons.language,
+                            label: 'Website',
+                            value: widget.card.website!,
+                            onTap: () =>
+                                _copyToClipboard(context, widget.card.website!, 'Website'),
+                          ),
+                        ),
+                      ],
 
-                  if (card.address != null) ...[
-                    const SizedBox(height: 12),
-                    _buildContactCard(
-                      context,
-                      icon: Icons.location_on,
-                      label: 'Address',
-                      value: card.address!,
-                      onTap: () =>
-                          _copyToClipboard(context, card.address!, 'Address'),
-                    ),
-                  ],
+                      if (widget.card.address != null) ...[
+                        const SizedBox(height: 12),
+                        _AnimatedCard(
+                          delay: 400,
+                          child: _buildContactCard(
+                            context,
+                            icon: Icons.location_on,
+                            label: 'Address',
+                            value: widget.card.address!,
+                            onTap: () =>
+                                _copyToClipboard(context, widget.card.address!, 'Address'),
+                          ),
+                        ),
+                      ],
 
-                  const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                  // Metadata
-                  Card(
+                      // Metadata
+                      _AnimatedCard(
+                        delay: 500,
+                        child: Card(
                     elevation: 1,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.access_time,
-                            size: 16,
-                            color: AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Added on ${_formatDate(card.createdAt)}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.access_time,
+                                  size: 16,
+                                  color: AppColors.textSecondary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Added on ${_formatDate(widget.card.createdAt)}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -364,3 +442,32 @@ class CardDetailScreen extends StatelessWidget {
   }
 }
 
+/// Animated card widget with delay
+class _AnimatedCard extends StatelessWidget {
+  final Widget child;
+  final int delay;
+
+  const _AnimatedCard({
+    required this.child,
+    this.delay = 0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 400 + delay),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 20 * (1 - value)),
+            child: child,
+          ),
+        );
+      },
+      child: child,
+    );
+  }
+}

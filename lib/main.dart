@@ -114,10 +114,26 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        if (state is Authenticated) {
-          return const HomeScreen();
-        }
-        return const SignInScreen();
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: ScaleTransition(
+                scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                  CurvedAnimation(
+                    parent: animation,
+                    curve: Curves.easeOutCubic,
+                  ),
+                ),
+                child: child,
+              ),
+            );
+          },
+          child: state is Authenticated
+              ? const HomeScreen(key: ValueKey('home'))
+              : const SignInScreen(key: ValueKey('signin')),
+        );
       },
     );
   }

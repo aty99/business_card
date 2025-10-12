@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
+import '../../../utils/animated_page_route.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_event.dart';
 import '../../auth/bloc/auth_state.dart';
@@ -19,13 +20,26 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final _searchController = TextEditingController();
+  late AnimationController _fabAnimationController;
+  late Animation<double> _fabScaleAnimation;
 
   @override
   void initState() {
     super.initState();
     _loadCards();
+    
+    // FAB animation
+    _fabAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _fabScaleAnimation = CurvedAnimation(
+      parent: _fabAnimationController,
+      curve: Curves.easeInOut,
+    );
+    _fabAnimationController.forward();
   }
 
   void _loadCards() {
@@ -45,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _fabAnimationController.dispose();
     super.dispose();
   }
 
@@ -189,58 +204,94 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          final authState = context.read<AuthBloc>().state;
-          if (authState is Authenticated) {
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => BlocProvider.value(
-                  value: context.read<CardBloc>(),
-                  child: AddCardScreen(userId: authState.user.id),
+      floatingActionButton: ScaleTransition(
+        scale: _fabScaleAnimation,
+        child: FloatingActionButton.extended(
+          onPressed: () async {
+            // Scale down animation
+            _fabAnimationController.reverse();
+            await Future.delayed(const Duration(milliseconds: 100));
+            _fabAnimationController.forward();
+            
+            if (!mounted) return;
+            final authState = context.read<AuthBloc>().state;
+            if (authState is Authenticated) {
+              final cardBloc = context.read<CardBloc>();
+              final result = await Navigator.push(
+                context,
+                ScalePageRoute(
+                  page: BlocProvider.value(
+                    value: cardBloc,
+                    child: AddCardScreen(userId: authState.user.id),
+                  ),
                 ),
-              ),
-            );
-            if (result == true) {
-              _loadCards();
+              );
+              if (result == true && mounted) {
+                _loadCards();
+              }
             }
-          }
-        },
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.add),
-        label: const Text('Add Card'),
+          },
+          backgroundColor: AppColors.primary,
+          icon: const Icon(Icons.add),
+          label: const Text('Add Card'),
+          heroTag: 'add_card_fab',
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.credit_card_off,
-            size: 80,
-            color: AppColors.grey.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'No business cards yet',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textSecondary,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: 1.0),
+        duration: const Duration(milliseconds: 800),
+        curve: Curves.easeOutCubic,
+        builder: (context, value, child) {
+          return Opacity(
+            opacity: value,
+            child: Transform.translate(
+              offset: Offset(0, 20 * (1 - value)),
+              child: child,
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Tap the + button to add your first card',
-            style: TextStyle(
-              color: AppColors.textLight,
+          );
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 1000),
+              curve: Curves.elasticOut,
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scale: value,
+                  child: child,
+                );
+              },
+              child: Icon(
+                Icons.credit_card_off,
+                size: 80,
+                color: AppColors.grey.withValues(alpha: 0.5),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            const Text(
+              'No business cards yet',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Tap the + button to add your first card',
+              style: TextStyle(
+                color: AppColors.textLight,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -255,103 +306,138 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: cards.length,
         itemBuilder: (context, index) {
           final card = cards[index];
-          return _buildCardItem(card);
+          // Staggered animation for list items
+          return TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.0, end: 1.0),
+            duration: Duration(milliseconds: 300 + (index * 100)),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(30 * (1 - value), 0),
+                  child: child,
+                ),
+              );
+            },
+            child: _buildCardItem(card, index),
+          );
         },
       ),
     );
   }
 
-  Widget _buildCardItem(BusinessCardModel card) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: InkWell(
-        onTap: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => BlocProvider.value(
-                value: context.read<CardBloc>(),
-                child: CardDetailScreen(card: card),
-              ),
-            ),
-          );
-          if (result == true) {
-            _loadCards();
-          }
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              // Avatar
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    card.fullName.isNotEmpty
-                        ? card.fullName[0].toUpperCase()
-                        : '?',
-                    style: const TextStyle(
-                      color: AppColors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+  Widget _buildCardItem(BusinessCardModel card, int index) {
+    return Hero(
+      tag: 'card_${card.id}',
+      child: Material(
+        color: Colors.transparent,
+        child: Card(
+          margin: const EdgeInsets.only(bottom: 16),
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: InkWell(
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                SlideFadePageRoute(
+                  page: BlocProvider.value(
+                    value: context.read<CardBloc>(),
+                    child: CardDetailScreen(card: card),
                   ),
                 ),
-              ),
-              const SizedBox(width: 16),
+              );
+              if (result == true) {
+                _loadCards();
+              }
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  // Avatar with Hero animation
+                  Hero(
+                    tag: 'card_avatar_${card.id}',
+                    child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Center(
+                        child: Text(
+                          card.fullName.isNotEmpty
+                              ? card.fullName[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
 
-              // Card details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      card.fullName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+                  // Card details
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          card.fullName,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          card.jobTitle,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          card.companyName,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      card.jobTitle,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      card.companyName,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
 
-              // Arrow icon
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: AppColors.grey,
+                  // Arrow icon with subtle animation
+                  TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: Duration(milliseconds: 400 + (index * 100)),
+                    curve: Curves.easeOut,
+                    builder: (context, value, child) {
+                      return Opacity(
+                        opacity: value,
+                        child: child,
+                      );
+                    },
+                    child: const Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16,
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

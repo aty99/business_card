@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/validators.dart';
+import '../../../utils/animated_page_route.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -245,8 +246,8 @@ class _SignInScreenState extends State<SignInScreen>
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (_) => BlocProvider.value(
+                                  SlidePageRoute(
+                                    page: BlocProvider.value(
                                       value: context.read<AuthBloc>(),
                                       child: const SignUpScreen(),
                                     ),
