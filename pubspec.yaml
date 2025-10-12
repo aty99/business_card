@@ -54,6 +54,9 @@ dependencies:
   
   # SVG support
   flutter_svg: ^2.0.9
+  
+  # Localization
+  easy_localization: ^3.0.7
 
 dev_dependencies:
   flutter_test:
@@ -88,6 +91,7 @@ flutter:
   assets:
     - assets/images/
     - assets/logo/
+    - assets/translations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

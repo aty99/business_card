@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/animated_page_route.dart';
@@ -63,12 +64,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('sign_out'.tr()),
+        content: Text('sign_out_confirm'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: Text('cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              context.read<AuthBloc>().add(const SignOutRequested());
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+            ),
+            child: Text('sign_out'.tr()),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('My Business Cards'),
+        title: Text('my_cards'.tr()),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
         elevation: 0,
@@ -80,45 +107,75 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   icon: const Icon(Icons.more_vert),
                   onSelected: (value) {
                     if (value == 'logout') {
-                      context.read<AuthBloc>().add(const SignOutRequested());
+                      _showLogoutDialog(context);
+                    } else if (value == 'language') {
+                      // Toggle language
+                      if (context.locale == const Locale('en')) {
+                        context.setLocale(const Locale('ar'));
+                      } else {
+                        context.setLocale(const Locale('en'));
+                      }
                     }
                   },
                   itemBuilder: (context) => [
                     PopupMenuItem(
                       value: 'profile',
+                      enabled: false,
                       child: Row(
                         children: [
                           const Icon(Icons.person, color: AppColors.textPrimary),
                           const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                authState.user.fullName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  authState.user.fullName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                authState.user.email,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondary,
+                                Text(
+                                  authState.user.email,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
                     const PopupMenuDivider(),
-                    const PopupMenuItem(
+                    PopupMenuItem(
+                      value: 'language',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.language, color: AppColors.primary),
+                          const SizedBox(width: 12),
+                          Text('language'.tr()),
+                          const Spacer(),
+                          Text(
+                            context.locale == const Locale('ar') ? 'English' : 'العربية',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    PopupMenuItem(
                       value: 'logout',
                       child: Row(
                         children: [
-                          Icon(Icons.logout, color: AppColors.error),
-                          SizedBox(width: 12),
-                          Text('Logout'),
+                          const Icon(Icons.logout, color: AppColors.error),
+                          const SizedBox(width: 12),
+                          Text('sign_out'.tr()),
                         ],
                       ),
                     ),
@@ -141,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               onChanged: _searchCards,
               style: const TextStyle(color: AppColors.white),
               decoration: InputDecoration(
-                hintText: 'Search by name or company...',
+                hintText: 'search'.tr(),
                 hintStyle: TextStyle(color: AppColors.white.withValues(alpha: 0.7)),
                 prefixIcon: const Icon(Icons.search, color: AppColors.white),
                 suffixIcon: _searchController.text.isNotEmpty
@@ -233,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           },
           backgroundColor: AppColors.primary,
           icon: const Icon(Icons.add),
-          label: const Text('Add Card'),
+          label: Text('add_card'.tr()),
           heroTag: 'add_card_fab',
         ),
       ),
@@ -275,18 +332,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No business cards yet',
-              style: TextStyle(
+            Text(
+              'no_cards'.tr(),
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Tap the + button to add your first card',
-              style: TextStyle(
+            Text(
+              'no_cards_description'.tr(),
+              style: const TextStyle(
                 color: AppColors.textLight,
               ),
             ),

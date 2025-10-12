@@ -15,22 +15,22 @@ class IntroModel {
 class IntroData {
   static const List<IntroModel> introScreens = [
     IntroModel(
-      title: "Don't worry about too many cards.",
-      description: "With BusinessCode, you can add and share various types of cards, such as business cards, ID cards, and pass card.",
+      title: "intro_1_title",
+      description: "intro_1_description",
       illustration: "intro_1",
-      buttonText: "Start",
+      buttonText: "start",
     ),
     IntroModel(
-      title: "Save it on your iOS wallet or our app",
-      description: "You can save a copy of your cards on the iOS wallet or on the Business Card app with just a click.",
+      title: "intro_2_title",
+      description: "intro_2_description",
       illustration: "intro_2",
-      buttonText: "Next",
+      buttonText: "next",
     ),
     IntroModel(
-      title: "Share it with others easily",
-      description: "With Business Code, easily share your cards with others via a link or by scanning the QR code.",
+      title: "intro_3_title",
+      description: "intro_3_description",
       illustration: "intro_3",
-      buttonText: "Next",
+      buttonText: "next",
     ),
   ];
 }

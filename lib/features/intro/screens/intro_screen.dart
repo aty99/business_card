@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../models/intro_model.dart';
 import '../../../widgets/intro_illustrations.dart';
 import '../../../utils/app_colors.dart';
@@ -112,30 +113,40 @@ class _IntroScreenState extends State<IntroScreen>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Language selector
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.lightGrey),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.translate,
-                  size: 16,
-                  color: AppColors.introTeal,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'EN',
-                  style: TextStyle(
+          GestureDetector(
+            onTap: () {
+              // Toggle language
+              if (context.locale == const Locale('en')) {
+                context.setLocale(const Locale('ar'));
+              } else {
+                context.setLocale(const Locale('en'));
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.lightGrey),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.translate,
+                    size: 16,
                     color: AppColors.introTeal,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  Text(
+                    context.locale == const Locale('ar') ? 'EN' : 'AR',
+                    style: TextStyle(
+                      color: AppColors.introTeal,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           
@@ -144,7 +155,7 @@ class _IntroScreenState extends State<IntroScreen>
             TextButton(
               onPressed: _completeIntro,
               child: Text(
-                'Skip',
+                'skip'.tr(),
                 style: TextStyle(
                   color: AppColors.introBlue,
                   fontSize: 14,
@@ -174,7 +185,7 @@ class _IntroScreenState extends State<IntroScreen>
           
           // Title
           Text(
-            intro.title,
+            intro.title.tr(),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 24,
@@ -188,7 +199,7 @@ class _IntroScreenState extends State<IntroScreen>
           
           // Description
           Text(
-            intro.description,
+            intro.description.tr(),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 16,
@@ -253,7 +264,7 @@ class _IntroScreenState extends State<IntroScreen>
             borderRadius: BorderRadius.circular(28),
             child: Center(
               child: Text(
-                intro.buttonText,
+                intro.buttonText.tr(),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,
