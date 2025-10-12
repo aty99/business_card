@@ -28,6 +28,7 @@ class AddCardScreen extends StatefulWidget {
 class _AddCardScreenState extends State<AddCardScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  bool _isSaving = false;
   final _fullNameController = TextEditingController();
   final _companyNameController = TextEditingController();
   final _jobTitleController = TextEditingController();
@@ -174,7 +175,7 @@ class _AddCardScreenState extends State<AddCardScreen>
     }
   }
 
-  void _saveCard() {
+  void _saveCard() async {
     if (!_isScanned) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -184,6 +185,12 @@ class _AddCardScreenState extends State<AddCardScreen>
       );
       return;
     }
+    
+    if (_isSaving) return; // Prevent multiple saves
+    
+    setState(() {
+      _isSaving = true;
+    });
 
     if (_formKey.currentState!.validate()) {
       final card = BusinessCardModel(
@@ -204,8 +211,29 @@ class _AddCardScreenState extends State<AddCardScreen>
         createdAt: widget.card?.createdAt ?? DateTime.now(),
       );
 
-      context.read<CardBloc>().add(AddCard(card));
-      Navigator.pop(context, true);
+      try {
+        context.read<CardBloc>().add(AddCard(card));
+        Navigator.pop(context, true);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error saving card: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isSaving = false;
+          });
+        }
+      }
+    } else {
+      setState(() {
+        _isSaving = false;
+      });
     }
   }
 
@@ -373,7 +401,7 @@ class _AddCardScreenState extends State<AddCardScreen>
 
                   // Save button
                   ElevatedButton(
-                    onPressed: _saveCard,
+                    onPressed: _isSaving ? null : _saveCard,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.white,
@@ -383,13 +411,38 @@ class _AddCardScreenState extends State<AddCardScreen>
                       ),
                       elevation: 2,
                     ),
-                    child: Text(
-                      widget.card != null ? 'Update Card' : 'Save Card',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: _isSaving
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                widget.card != null ? 'Updating...' : 'Saving...',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Text(
+                            widget.card != null ? 'Update Card' : 'Save Card',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ],
               ),

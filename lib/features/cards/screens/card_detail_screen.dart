@@ -28,6 +28,7 @@ class _CardDetailScreenState extends State<CardDetailScreen>
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  bool _isDeleting = false;
 
   @override
   void initState() {
@@ -77,6 +78,7 @@ class _CardDetailScreenState extends State<CardDetailScreen>
   void _deleteCard(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: false, // Prevent dismissing during deletion
       builder: (dialogContext) => ScaleTransition(
         scale: CurvedAnimation(
           parent: _animationController,
@@ -90,30 +92,73 @@ class _CardDetailScreenState extends State<CardDetailScreen>
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
+              onPressed: _isDeleting ? null : () => Navigator.pop(dialogContext),
               child: const Text('Cancel'),
             ),
-            TextButton(
-              onPressed: () async {
-                // Delete the image file if it exists
-                if (widget.card.imagePath != null) {
-                  await ImageStorage.deleteImage(widget.card.imagePath!);
-                }
-                
-                context.read<CardBloc>().add(DeleteCard(widget.card.id));
-                Navigator.pop(dialogContext);
-                Navigator.pop(context, true);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Card deleted successfully'),
-                    backgroundColor: AppColors.success,
+            StatefulBuilder(
+              builder: (context, setDialogState) {
+                return TextButton(
+                  onPressed: _isDeleting ? null : () async {
+                    setDialogState(() {
+                      _isDeleting = true;
+                    });
+                    
+                    try {
+                      // Delete the image file if it exists
+                      if (widget.card.imagePath != null) {
+                        await ImageStorage.deleteImage(widget.card.imagePath!);
+                      }
+                      
+                      context.read<CardBloc>().add(DeleteCard(widget.card.id));
+                      
+                      if (mounted) {
+                        Navigator.pop(dialogContext);
+                        Navigator.pop(context, true);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Card deleted successfully'),
+                            backgroundColor: AppColors.success,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        setDialogState(() {
+                          _isDeleting = false;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error deleting card: $e'),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.error,
                   ),
+                  child: _isDeleting
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.error,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('Deleting...'),
+                          ],
+                        )
+                      : const Text('Delete'),
                 );
               },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.error,
-              ),
-              child: const Text('Delete'),
             ),
           ],
         ),

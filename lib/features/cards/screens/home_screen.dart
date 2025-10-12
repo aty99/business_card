@@ -25,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final _searchController = TextEditingController();
   late AnimationController _fabAnimationController;
   late Animation<double> _fabScaleAnimation;
+  bool _isLoggingOut = false;
+  bool _isAddingCard = false;
 
   @override
   void initState() {
@@ -172,7 +174,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: _isLoggingOut ? null : () async {
+                          setState(() {
+                            _isLoggingOut = true;
+                          });
+                          
                           Navigator.pop(dialogContext);
                           context.read<AuthBloc>().add(const SignOutRequested());
                         },
@@ -185,13 +191,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           ),
                           elevation: 0,
                         ),
-                        child: Text(
-                          'sign_out'.tr(),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child: _isLoggingOut
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Signing out...',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                'sign_out'.tr(),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
                   ],
@@ -422,7 +453,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ],
           ),
           child: FloatingActionButton.extended(
-            onPressed: () async {
+            onPressed: _isAddingCard ? null : () async {
+              setState(() {
+                _isAddingCard = true;
+              });
+              
               // Scale down animation
               _fabAnimationController.reverse();
               await Future.delayed(const Duration(milliseconds: 100));
@@ -445,16 +480,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   _loadCards();
                 }
               }
+              
+              if (mounted) {
+                setState(() {
+                  _isAddingCard = false;
+                });
+              }
             },
             backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             elevation: 0,
-            icon: const Icon(
-              Icons.add_rounded,
-              size: 24,
-            ),
+            icon: _isAddingCard
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Icon(
+                    Icons.add_rounded,
+                    size: 24,
+                  ),
             label: Text(
-              'add_card'.tr(),
+              _isAddingCard ? 'Adding...' : 'add_card'.tr(),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
