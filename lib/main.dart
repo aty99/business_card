@@ -12,6 +12,7 @@ import 'features/auth/screens/sign_in_screen.dart';
 import 'features/cards/bloc/card_bloc.dart';
 import 'features/cards/screens/home_screen.dart';
 import 'features/intro/screens/intro_screen.dart';
+import 'features/splash/screens/splash_screen.dart';
 import 'utils/app_colors.dart';
 import 'utils/intro_helper.dart';
 
@@ -119,11 +120,26 @@ class AuthWrapper extends StatefulWidget {
 class _AuthWrapperState extends State<AuthWrapper> {
   bool _showIntro = true;
   bool _isLoading = true;
+  bool _showSplash = true;
 
   @override
   void initState() {
     super.initState();
-    _checkIntroStatus();
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    // Show splash for at least 2 seconds
+    await Future.delayed(const Duration(seconds: 2));
+    
+    if (mounted) {
+      setState(() {
+        _showSplash = false;
+      });
+      
+      // Check intro status after splash
+      await _checkIntroStatus();
+    }
   }
 
   Future<void> _checkIntroStatus() async {
@@ -149,6 +165,10 @@ class _AuthWrapperState extends State<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    if (_showSplash) {
+      return SplashScreen(onComplete: () {});
+    }
+
     if (_isLoading) {
       return const Scaffold(
         backgroundColor: Colors.white,
