@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../widgets/business_code_logo.dart';
+import '../../../widgets/app_icon_widget.dart';
 
 class SplashScreen extends StatefulWidget {
   final VoidCallback onComplete;
@@ -83,7 +84,7 @@ class _SplashScreenState extends State<SplashScreen>
             opacity: _fadeAnimation,
             child: ScaleTransition(
               scale: _scaleAnimation,
-              child: const SplashLogo(size: 200),
+              child: const AppIconWidget(size: 200, showText: true),
             ),
           ),
         ),
