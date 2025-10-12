@@ -45,5 +45,24 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
+  
+  // Intro specific colors
+  static const Color introGreen = Color(0xFF4CAF50);
+  static const Color introTeal = Color(0xFF26A69A);
+  static const Color introLightGreen = Color(0xFF81C784);
+  static const Color introBlue = Color(0xFF2196F3);
+  
+  // Intro gradients
+  static const Gradient introButtonGradient = LinearGradient(
+    colors: [introLightGreen, introTeal],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
+  
+  static const Gradient introButtonGradientBlue = LinearGradient(
+    colors: [introLightGreen, introBlue],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
 }
 
