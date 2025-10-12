@@ -3,7 +3,6 @@ import '../../../repositories/card_repository.dart';
 import 'card_event.dart';
 import 'card_state.dart';
 
-/// BLoC for managing business cards state
 class CardBloc extends Bloc<CardEvent, CardState> {
   final CardRepository cardRepository;
 
@@ -15,7 +14,6 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     on<SearchCards>(_onSearchCards);
   }
 
-  /// Load all cards for a user
   Future<void> _onLoadCards(
     LoadCards event,
     Emitter<CardState> emit,
@@ -33,7 +31,6 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     }
   }
 
-  /// Add a new card
   Future<void> _onAddCard(
     AddCard event,
     Emitter<CardState> emit,
@@ -48,7 +45,6 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     }
   }
 
-  /// Update an existing card
   Future<void> _onUpdateCard(
     UpdateCard event,
     Emitter<CardState> emit,
@@ -63,7 +59,6 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     }
   }
 
-  /// Delete a card
   Future<void> _onDeleteCard(
     DeleteCard event,
     Emitter<CardState> emit,
@@ -90,7 +85,6 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     }
   }
 
-  /// Search cards
   Future<void> _onSearchCards(
     SearchCards event,
     Emitter<CardState> emit,

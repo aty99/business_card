@@ -18,6 +18,7 @@ import 'utils/app_colors.dart';
 import 'utils/intro_helper.dart';
 
 void main() async {
+  
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 

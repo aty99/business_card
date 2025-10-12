@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'app_colors.dart';
 
+import '../core/constants/app_constants.dart';
+
 /// Custom animated snackbar with different types and animations
 /// 
 /// Usage examples:
@@ -17,12 +19,12 @@ import 'app_colors.dart';
 /// CustomSnackBar.showInfo(context, message: 'Information message');
 /// ```
 class CustomSnackBar {
-  static const Duration _animationDuration = Duration(milliseconds: 300);
-  static const Duration _displayDuration = Duration(seconds: 3);
+  static const Duration _animationDuration = AppConstants.mediumAnimationDuration;
+  static const Duration _displayDuration = AppConstants.snackBarDuration;
   
   /// Default positioning for snackbars
-  static const EdgeInsets _defaultMargin = EdgeInsets.symmetric(horizontal: 16);
-  static const double _defaultTopMargin = 10.0;
+  static const EdgeInsets _defaultMargin = EdgeInsets.symmetric(horizontal: AppConstants.mediumSpacing);
+  static const double _defaultTopMargin = AppConstants.smallSpacing;
 
   /// Show success snackbar with green color and checkmark animation
   static void showSuccess(

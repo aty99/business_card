@@ -5,6 +5,11 @@ import '../../../models/business_card_model.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/animated_page_route.dart';
 import '../../../utils/custom_snackbar.dart';
+import '../../../core/widgets/custom_app_bar.dart';
+import '../../../core/widgets/animated_card.dart';
+import '../../../core/widgets/empty_state_widget.dart';
+import '../../../core/widgets/loading_widget.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../auth/bloc/auth_bloc.dart';
 import '../../auth/bloc/auth_event.dart';
 import '../../auth/bloc/auth_state.dart';
@@ -58,6 +63,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (authState is Authenticated) {
       context.read<CardBloc>().add(SearchCards(authState.user.id, query));
     }
+  }
+
+  void _navigateToAddCard(BuildContext context) {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is Authenticated) {
+      Navigator.push(
+        context,
+        SlideFadePageRoute(
+          page: BlocProvider.value(
+            value: context.read<CardBloc>(),
+            child: AddCardScreen(userId: authState.user.id),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _navigateToCardDetail(BuildContext context, BusinessCardModel card) {
+    Navigator.push(
+      context,
+      SlideFadePageRoute(
+        page: CardDetailScreen(card: card),
+      ),
+    );
   }
 
   @override
@@ -240,8 +269,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text('my_cards'.tr()),
+      appBar: CustomAppBar(
+        title: AppStrings.myCards.tr(),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
         elevation: 0,
@@ -415,13 +444,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               },
               builder: (context, state) {
                 if (state is CardLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                  return context.loadingIndicator(
+                    message: AppStrings.loadingMessage.tr(),
                   );
                 }
 
                 if (state is CardEmpty) {
-                  return _buildEmptyState();
+                  return context.noCardsEmptyState(
+                    onAddCard: () => _navigateToAddCard(context),
+                  );
                 }
 
                 if (state is CardLoaded) {
@@ -631,25 +662,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: cards.length,
-        itemBuilder: (context, index) {
-          final card = cards[index];
-          // Staggered animation for list items
-          return TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0.0, end: 1.0),
-            duration: Duration(milliseconds: 300 + (index * 100)),
-            curve: Curves.easeOutCubic,
-            builder: (context, value, child) {
-              return Opacity(
-                opacity: value,
-                child: Transform.translate(
-                  offset: Offset(30 * (1 - value), 0),
-                  child: child,
-                ),
+            itemBuilder: (context, index) {
+              final card = cards[index];
+              return AnimatedCard(
+                index: index,
+                onTap: () => _navigateToCardDetail(context, card),
+                child: _buildCardItem(card, index),
               );
             },
-            child: _buildCardItem(card, index),
-          );
-        },
       ),
     );
   }
