@@ -10,7 +10,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
     
     <application
-        android:label="business_card_app"
+        android:label="BCode"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

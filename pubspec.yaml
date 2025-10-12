@@ -1,5 +1,5 @@
-name: business_card_app
-description: "Business Code - Digital Business Card Manager"
+name: bcode
+description: "BCode - Digital Business Card Manager"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
