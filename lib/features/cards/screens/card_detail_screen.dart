@@ -212,15 +212,47 @@ class _CardDetailScreenState extends State<CardDetailScreen>
                         : AppColors.primaryGradient,
                   ),
                   child: widget.card.imagePath != null
-                      ? Image.file(
-                          File(widget.card.imagePath!),
-                          fit: BoxFit.cover,
+                      ? FutureBuilder<bool>(
+                          future: ImageStorage.imageExists(widget.card.imagePath!),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.white,
+                                ),
+                              );
+                            }
+                            
+                            if (snapshot.hasData && snapshot.data == true) {
+                              return Image.file(
+                                File(widget.card.imagePath!),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Center(
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      size: 80,
+                                      color: AppColors.white.withOpacity(0.7),
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              return Center(
+                                child: Icon(
+                                  Icons.credit_card,
+                                  size: 80,
+                                  color: AppColors.white.withOpacity(0.7),
+                                ),
+                              );
+                            }
+                          },
                         )
                       : Center(
                           child: Icon(
                             Icons.credit_card,
                             size: 80,
-                            color: AppColors.primary.withValues(alpha: 0.7),
+                            color: AppColors.white.withOpacity(0.7),
                           ),
                         ),
                 ),

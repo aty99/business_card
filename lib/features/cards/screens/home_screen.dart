@@ -274,6 +274,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
         elevation: 0,
+        showBackButton: false,
         actions: [
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, authState) {

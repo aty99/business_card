@@ -16,6 +16,7 @@ import 'features/intro/screens/intro_screen.dart';
 import 'features/splash/screens/splash_screen.dart';
 import 'utils/app_colors.dart';
 import 'utils/intro_helper.dart';
+import 'utils/image_storage.dart';
 
 void main() async {
   
@@ -34,6 +35,9 @@ void main() async {
   final cardRepository = CardRepository();
   await authRepository.init();
   await cardRepository.init();
+  
+  // Clean up any leftover temp files
+  await ImageStorage.cleanupTempFiles();
 
   runApp(
     EasyLocalization(
