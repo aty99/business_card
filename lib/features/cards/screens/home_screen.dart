@@ -610,11 +610,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildCardItem(BusinessCardModel card, int index) {
-    return Hero(
-      tag: 'card_${card.id}',
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
+    return Material(
+      color: Colors.transparent,
+      child: Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -650,9 +648,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: Row(
                   children: [
                     // Enhanced Avatar with gradient
-                    Hero(
-                      tag: 'card_avatar_${card.id}',
-                      child: Container(
+                    Container(
                         width: 70,
                         height: 70,
                         decoration: BoxDecoration(
@@ -686,7 +682,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                      ),
                     ),
                     const SizedBox(width: 20),
 
@@ -772,7 +767,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
         ),
-      ),
     );
   }
 }
