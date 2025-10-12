@@ -1,15 +1,15 @@
+import 'package:bcode/core/di/injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'models/user_model.dart';
+import 'features/auth/data/model/user_model.dart';
 import 'models/business_card_model.dart';
-import 'repositories/auth_repository.dart';
 import 'repositories/card_repository.dart';
-import 'features/auth/bloc/auth_bloc.dart';
-import 'features/auth/bloc/auth_event.dart';
-import 'features/auth/bloc/auth_state.dart';
-import 'features/auth/screens/sign_in_screen.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth_event.dart';
+import 'features/auth/presentation/bloc/auth_state.dart';
+import 'features/auth/presentation/screens/sign_in_screen.dart';
 import 'features/cards/bloc/card_bloc.dart';
 import 'features/cards/screens/home_screen.dart';
 import 'features/intro/screens/intro_screen.dart';
@@ -19,7 +19,6 @@ import 'utils/intro_helper.dart';
 import 'utils/image_storage.dart';
 
 void main() async {
-  
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
@@ -31,11 +30,9 @@ void main() async {
   Hive.registerAdapter(BusinessCardModelAdapter());
 
   // Initialize repositories
-  final authRepository = AuthRepository();
   final cardRepository = CardRepository();
-  await authRepository.init();
   await cardRepository.init();
-  
+
   // Clean up any leftover temp files
   await ImageStorage.cleanupTempFiles();
 
@@ -44,36 +41,25 @@ void main() async {
       supportedLocales: const [Locale('en'), Locale('ar')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      child: MyApp(
-        authRepository: authRepository,
-        cardRepository: cardRepository,
-      ),
+      child: MyApp(cardRepository: cardRepository),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final AuthRepository authRepository;
   final CardRepository cardRepository;
 
-  const MyApp({
-    Key? key,
-    required this.authRepository,
-    required this.cardRepository,
-  }) : super(key: key);
+  const MyApp({super.key, required this.cardRepository});
 
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider.value(value: authRepository),
-        RepositoryProvider.value(value: cardRepository),
-      ],
+      providers: [RepositoryProvider.value(value: cardRepository)],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => AuthBloc(authRepository: authRepository)
-              ..add(const CheckAuthStatus()),
+            create: (context) =>
+                Injector().authBloc..add(const CheckAuthStatus()),
           ),
           BlocProvider(
             create: (context) => CardBloc(cardRepository: cardRepository),
@@ -153,12 +139,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Future<void> _initializeApp() async {
     // Show splash for at least 2 seconds
     await Future.delayed(const Duration(seconds: 2));
-    
+
     if (mounted) {
       setState(() {
         _showSplash = false;
       });
-      
+
       // Check intro status after splash
       await _checkIntroStatus();
     }

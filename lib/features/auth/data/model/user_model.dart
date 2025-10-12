@@ -2,8 +2,6 @@ import 'package:hive/hive.dart';
 
 part 'user_model.g.dart';
 
-/// User model for authentication
-/// Stores user credentials and profile information
 @HiveType(typeId: 0)
 class UserModel extends HiveObject {
   @HiveField(0)

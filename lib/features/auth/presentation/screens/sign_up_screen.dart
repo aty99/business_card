@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../utils/app_colors.dart';
-import '../../../utils/validators.dart';
-import '../../../utils/custom_snackbar.dart';
+import '../../../../utils/app_colors.dart';
+import '../../../../utils/validators.dart';
+import '../../../../utils/custom_snackbar.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';

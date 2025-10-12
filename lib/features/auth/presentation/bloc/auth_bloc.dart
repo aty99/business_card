@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../repositories/auth_repository.dart';
+import '../../data/repository/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
@@ -18,7 +18,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
-      final user = authRepository.getCurrentUser();
+      final user = await authRepository.getCurrentUser();
       if (user != null) {
         emit(Authenticated(user));
       } else {
@@ -76,4 +76,3 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 }
-
