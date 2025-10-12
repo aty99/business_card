@@ -1,0 +1,49 @@
+import 'package:flutter/material.dart';
+
+/// Application color scheme
+class AppColors {
+  // Primary colors
+  static const Color primary = Color(0xFF6C63FF);
+  static const Color primaryDark = Color(0xFF5A52D5);
+  static const Color primaryLight = Color(0xFF8B84FF);
+  
+  // Secondary colors
+  static const Color secondary = Color(0xFF00D4FF);
+  static const Color secondaryDark = Color(0xFF00B8E6);
+  
+  // Background colors
+  static const Color background = Color(0xFFF5F7FA);
+  static const Color cardBackground = Colors.white;
+  static const Color darkBackground = Color(0xFF1A1A2E);
+  
+  // Text colors
+  static const Color textPrimary = Color(0xFF2D3436);
+  static const Color textSecondary = Color(0xFF636E72);
+  static const Color textLight = Color(0xFF95A5A6);
+  
+  // Status colors
+  static const Color success = Color(0xFF00B894);
+  static const Color error = Color(0xFFFF6B6B);
+  static const Color warning = Color(0xFFFDCB6E);
+  static const Color info = Color(0xFF74B9FF);
+  
+  // Neutral colors
+  static const Color white = Colors.white;
+  static const Color black = Colors.black;
+  static const Color grey = Color(0xFFB2BEC3);
+  static const Color lightGrey = Color(0xFFDFE6E9);
+  
+  // Gradient colors
+  static const Gradient primaryGradient = LinearGradient(
+    colors: [primary, primaryLight],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  
+  static const Gradient secondaryGradient = LinearGradient(
+    colors: [secondary, secondaryDark],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+}
+
