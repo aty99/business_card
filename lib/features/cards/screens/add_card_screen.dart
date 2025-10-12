@@ -316,11 +316,46 @@ class _AddCardScreenState extends State<AddCardScreen>
                 child: Stack(
                   children: [
                     if (_imagePath == null)
-                      const Center(
-                        child: Icon(
-                          Icons.credit_card,
-                          size: 64,
-                          color: AppColors.white,
+                      Center(
+                        child: Container(
+                          width: 100,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            color: AppColors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: AppColors.white.withOpacity(0.3),
+                              width: 2,
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.business,
+                                size: 24,
+                                color: AppColors.white.withOpacity(0.8),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                width: 40,
+                                height: 3,
+                                decoration: BoxDecoration(
+                                  color: AppColors.white.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Container(
+                                width: 60,
+                                height: 3,
+                                decoration: BoxDecoration(
+                                  color: AppColors.white.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     Positioned(

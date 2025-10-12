@@ -249,10 +249,45 @@ class _CardDetailScreenState extends State<CardDetailScreen>
                           },
                         )
                       : Center(
-                          child: Icon(
-                            Icons.credit_card,
-                            size: 80,
-                            color: AppColors.white.withOpacity(0.7),
+                          child: Container(
+                            width: 120,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: AppColors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: AppColors.white.withOpacity(0.3),
+                                width: 2,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.business,
+                                  size: 32,
+                                  color: AppColors.white.withOpacity(0.8),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: 60,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  width: 80,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                 ),
