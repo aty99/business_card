@@ -111,7 +111,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                   // Logo Section
                   _buildLogo(),
                   
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 24),
                   
                   // Sign Up Title
                   Text(

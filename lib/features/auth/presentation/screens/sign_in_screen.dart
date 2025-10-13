@@ -99,11 +99,11 @@ class _SignInScreenState extends State<SignInScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 16),
                   // Logo Section
                   _buildLogo(),
                   
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 24),
                   
                   // Login Title
                   Text(
@@ -115,7 +115,7 @@ class _SignInScreenState extends State<SignInScreen>
                     ),
                   ),
                   
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
                   
                   // Form
                   Form(
@@ -136,7 +136,7 @@ class _SignInScreenState extends State<SignInScreen>
                           },
                         ),
                         
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         
                         // Password Field
                         DefaultTextField(
@@ -160,7 +160,7 @@ class _SignInScreenState extends State<SignInScreen>
                         // Login Button
                         _buildLoginButton(state),
                         
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         
                         // Create Account Link
                         _buildCreateAccountLink(),
@@ -168,7 +168,7 @@ class _SignInScreenState extends State<SignInScreen>
                     ),
                   ),
                   
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
