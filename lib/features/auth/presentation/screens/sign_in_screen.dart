@@ -256,7 +256,7 @@ class _SignInScreenState extends State<SignInScreen>
       child: Text(
         'forgot_password'.tr(),
         style: TextStyle(
-          color: AppColors.primary,
+          color: AppColors.linkBlue,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
@@ -331,7 +331,7 @@ class _SignInScreenState extends State<SignInScreen>
           child: Text(
             'create_account'.tr(),
             style: TextStyle(
-              color: AppColors.primary,
+              color: AppColors.linkBlue,
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),

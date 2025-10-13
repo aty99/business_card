@@ -27,6 +27,9 @@ class AppColors {
   static const Color warning = Color(0xFFFDCB6E);
   static const Color info = Color(0xFF74B9FF);
   
+  // Link colors
+  static const Color linkBlue = Color(0xFF2196F3);
+  
   // Neutral colors
   static const Color white = Colors.white;
   static const Color black = Colors.black;
