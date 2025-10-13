@@ -6,7 +6,8 @@ abstract class AuthRepository {
   Future<UserModel> signUp({
     required String email,
     required String password,
-    required String fullName,
+    required String firstName,
+    required String lastName,
   });
   Future<UserModel> signIn({required String email, required String password});
   Future<void> signOut();
@@ -25,11 +26,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserModel> signUp({
     required String email,
     required String password,
-    required String fullName,
+    required String firstName,
+    required String lastName,
   }) => _authLocalDataSource.signUp(
     email: email,
     password: password,
-    fullName: fullName,
+    firstName: firstName,
+    lastName: lastName,
   );
   @override
   Future<UserModel> signIn({required String email, required String password}) =>

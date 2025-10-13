@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../widgets/business_code_logo.dart';
-import '../../../widgets/app_icon_widget.dart';
+import '../widgets/app_icon_widget.dart';
 
 class SplashScreen extends StatefulWidget {
   final VoidCallback onComplete;
 
   const SplashScreen({
-    Key? key,
+    super.key,
     required this.onComplete,
-  }) : super(key: key);
+  });
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();

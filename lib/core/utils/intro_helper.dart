@@ -21,15 +21,6 @@ class IntroHelper {
     }
   }
 
-  /// Reset intro status (useful for testing)
-  static Future<void> resetIntroStatus() async {
-    try {
-      final box = await Hive.openBox('app_settings');
-      await box.put('intro_completed', false);
-    } catch (e) {
-      // Handle error silently
-    }
-  }
 
   /// Clear all app settings
   static Future<void> clearAllSettings() async {

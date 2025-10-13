@@ -19,6 +19,11 @@ class CardLoading extends CardState {
   const CardLoading();
 }
 
+
+class AddingCard extends CardState {
+  const AddingCard();
+}
+
 /// Loaded state with list of cards
 class CardLoaded extends CardState {
   final List<BusinessCardModel> cards;

@@ -14,38 +14,42 @@ class UserModel extends HiveObject {
   final String password;
 
   @HiveField(3)
-  final String fullName;
+  final String firstName;
 
   @HiveField(4)
   final DateTime createdAt;
+  @HiveField(5)
+  final String lastName;
 
   UserModel({
     required this.id,
     required this.email,
     required this.password,
-    required this.fullName,
+    required this.firstName,
     required this.createdAt,
+    required this.lastName,
   });
 
   UserModel copyWith({
     String? id,
     String? email,
     String? password,
-    String? fullName,
+    String? firstName,
     DateTime? createdAt,
+    String? lastName,
   }) {
     return UserModel(
       id: id ?? this.id,
       email: email ?? this.email,
       password: password ?? this.password,
-      fullName: fullName ?? this.fullName,
+      firstName: firstName ?? this.firstName,
       createdAt: createdAt ?? this.createdAt,
+      lastName: lastName ?? this.lastName,
     );
   }
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, fullName: $fullName, createdAt: $createdAt)';
+    return 'UserModel(id: $id, email: $email, firstName: $firstName, createdAt: $createdAt, lastName: $lastName)';
   }
 }
-

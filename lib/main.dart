@@ -1,4 +1,5 @@
 import 'package:bcode/core/di/injector.dart';
+import 'package:bcode/features/splash/screens/init_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -6,17 +7,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'features/auth/data/model/user_model.dart';
 import 'models/business_card_model.dart';
 import 'repositories/card_repository.dart';
-import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
-import 'features/auth/presentation/bloc/auth_state.dart';
-import 'features/auth/presentation/screens/sign_in_screen.dart';
 import 'features/cards/bloc/card_bloc.dart';
-import 'features/cards/screens/home_screen.dart';
-import 'features/intro/screens/intro_screen.dart';
-import 'features/splash/screens/splash_screen.dart';
-import 'utils/app_colors.dart';
-import 'utils/intro_helper.dart';
-import 'utils/image_storage.dart';
+import 'core/utils/app_colors.dart';
+import 'core/utils/image_storage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -108,113 +102,11 @@ class MyApp extends StatelessWidget {
                   ),
                 ),
               ),
-              home: const AuthWrapper(),
+              home: const InitPage(),
             );
           },
         ),
       ),
-    );
-  }
-}
-
-/// Wrapper to handle authentication state and navigation
-class AuthWrapper extends StatefulWidget {
-  const AuthWrapper({Key? key}) : super(key: key);
-
-  @override
-  State<AuthWrapper> createState() => _AuthWrapperState();
-}
-
-class _AuthWrapperState extends State<AuthWrapper> {
-  bool _showIntro = true;
-  bool _isLoading = true;
-  bool _showSplash = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    // Show splash for at least 2 seconds
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() {
-        _showSplash = false;
-      });
-
-      // Check intro status after splash
-      await _checkIntroStatus();
-    }
-  }
-
-  Future<void> _checkIntroStatus() async {
-    try {
-      final introCompleted = await IntroHelper.isIntroCompleted();
-      setState(() {
-        _showIntro = !introCompleted;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _showIntro = true;
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _onIntroComplete() {
-    setState(() {
-      _showIntro = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_showSplash) {
-      return SplashScreen(onComplete: () {});
-    }
-
-    if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-          ),
-        ),
-      );
-    }
-
-    if (_showIntro) {
-      return IntroScreen(onComplete: _onIntroComplete);
-    }
-
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 500),
-          transitionBuilder: (child, animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: ScaleTransition(
-                scale: Tween<double>(begin: 0.95, end: 1.0).animate(
-                  CurvedAnimation(
-                    parent: animation,
-                    curve: Curves.easeOutCubic,
-                  ),
-                ),
-                child: child,
-              ),
-            );
-          },
-          child: state is Authenticated
-              ? const HomeScreen(key: ValueKey('home'))
-              : const SignInScreen(key: ValueKey('signin')),
-        );
-      },
     );
   }
 }

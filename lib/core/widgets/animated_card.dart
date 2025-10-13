@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
-import '../../utils/app_colors.dart';
+import '../utils/app_colors.dart';
 
 /// A reusable animated card widget with staggered animation support
 class AnimatedCard extends StatefulWidget {

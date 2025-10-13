@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
-import '../../utils/app_colors.dart';
+import '../utils/app_colors.dart';
 
 /// A reusable loading widget with different styles
 class LoadingWidget extends StatelessWidget {

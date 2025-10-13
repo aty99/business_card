@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../constants/app_constants.dart';
-import '../../utils/app_colors.dart';
+import '../utils/app_colors.dart';
 
 /// A customizable app bar with animations and modern styling
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {

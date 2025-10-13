@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
-import '../../utils/app_colors.dart';
+import '../utils/app_colors.dart';
 
 /// A reusable animated button widget with loading state
 class AnimatedButton extends StatefulWidget {

@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../models/intro_model.dart';
-import '../../../widgets/intro_illustrations.dart';
-import '../../../utils/app_colors.dart';
-import '../../../utils/intro_helper.dart';
+import '../widgets/intro_illustrations.dart';
+import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/intro_helper.dart';
 
 class IntroScreen extends StatefulWidget {
   final VoidCallback onComplete;
 
-  const IntroScreen({
-    Key? key,
-    required this.onComplete,
-  }) : super(key: key);
+  const IntroScreen({super.key, required this.onComplete});
 
   @override
   State<IntroScreen> createState() => _IntroScreenState();
@@ -72,7 +68,7 @@ class _IntroScreenState extends State<IntroScreen>
           children: [
             // Header with language selector and skip button
             _buildHeader(),
-            
+
             // Main content
             Expanded(
               child: FadeTransition(
@@ -91,13 +87,13 @@ class _IntroScreenState extends State<IntroScreen>
                 ),
               ),
             ),
-            
+
             // Page indicators
             _buildPageIndicators(),
-            
+
             // Action button
             _buildActionButton(),
-            
+
             // Bottom spacing
             const SizedBox(height: 20),
           ],
@@ -131,11 +127,7 @@ class _IntroScreenState extends State<IntroScreen>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.translate,
-                    size: 16,
-                    color: AppColors.introTeal,
-                  ),
+                  Icon(Icons.translate, size: 16, color: AppColors.introTeal),
                   const SizedBox(width: 4),
                   Text(
                     context.locale == const Locale('ar') ? 'EN' : 'AR',
@@ -149,7 +141,7 @@ class _IntroScreenState extends State<IntroScreen>
               ),
             ),
           ),
-          
+
           // Skip button
           if (_currentPage < IntroData.introScreens.length - 1)
             TextButton(
@@ -180,9 +172,9 @@ class _IntroScreenState extends State<IntroScreen>
             width: 280,
             height: 200,
           ),
-          
+
           const SizedBox(height: 40),
-          
+
           // Title
           Text(
             intro.title.tr(),
@@ -194,9 +186,9 @@ class _IntroScreenState extends State<IntroScreen>
               height: 1.3,
             ),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Description
           Text(
             intro.description.tr(),
@@ -224,8 +216,8 @@ class _IntroScreenState extends State<IntroScreen>
             width: _currentPage == index ? 24 : 8,
             height: 8,
             decoration: BoxDecoration(
-              color: _currentPage == index 
-                  ? AppColors.introTeal 
+              color: _currentPage == index
+                  ? AppColors.introTeal
                   : AppColors.lightGrey,
               borderRadius: BorderRadius.circular(4),
             ),
@@ -238,14 +230,14 @@ class _IntroScreenState extends State<IntroScreen>
   Widget _buildActionButton() {
     final intro = IntroData.introScreens[_currentPage];
     final isLastPage = _currentPage == IntroData.introScreens.length - 1;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Container(
         width: double.infinity,
         height: 56,
         decoration: BoxDecoration(
-          gradient: isLastPage 
+          gradient: isLastPage
               ? AppColors.introButtonGradientBlue
               : AppColors.introButtonGradient,
           borderRadius: BorderRadius.circular(28),

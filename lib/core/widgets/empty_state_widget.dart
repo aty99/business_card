@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../constants/app_constants.dart';
-import '../../utils/app_colors.dart';
+import '../utils/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 
 /// A reusable empty state widget with customizable content

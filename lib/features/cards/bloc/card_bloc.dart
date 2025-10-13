@@ -14,10 +14,7 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     on<SearchCards>(_onSearchCards);
   }
 
-  Future<void> _onLoadCards(
-    LoadCards event,
-    Emitter<CardState> emit,
-  ) async {
+  Future<void> _onLoadCards(LoadCards event, Emitter<CardState> emit) async {
     emit(const CardLoading());
     try {
       final cards = cardRepository.getCardsByUserId(event.userId);
@@ -31,11 +28,9 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     }
   }
 
-  Future<void> _onAddCard(
-    AddCard event,
-    Emitter<CardState> emit,
-  ) async {
+  Future<void> _onAddCard(AddCard event, Emitter<CardState> emit) async {
     try {
+      emit(AddingCard());
       final savedCard = await cardRepository.saveCard(event.card);
       emit(CardAdded(savedCard));
       // Reload cards after adding
@@ -45,10 +40,7 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     }
   }
 
-  Future<void> _onUpdateCard(
-    UpdateCard event,
-    Emitter<CardState> emit,
-  ) async {
+  Future<void> _onUpdateCard(UpdateCard event, Emitter<CardState> emit) async {
     try {
       final updatedCard = await cardRepository.updateCard(event.card);
       emit(CardUpdated(updatedCard));
@@ -59,23 +51,22 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     }
   }
 
-  Future<void> _onDeleteCard(
-    DeleteCard event,
-    Emitter<CardState> emit,
-  ) async {
+  Future<void> _onDeleteCard(DeleteCard event, Emitter<CardState> emit) async {
     try {
       // Get the current user ID from the current state
       final currentState = state;
       String? userId;
-      
+
       if (currentState is CardLoaded) {
         // Get userId from the first card (all cards belong to same user)
-        userId = currentState.cards.isNotEmpty ? currentState.cards.first.userId : null;
+        userId = currentState.cards.isNotEmpty
+            ? currentState.cards.first.userId
+            : null;
       }
-      
+
       await cardRepository.deleteCard(event.cardId);
       emit(const CardDeleted());
-      
+
       // Reload cards after deleting if we have a userId
       if (userId != null) {
         add(LoadCards(userId));
@@ -102,4 +93,3 @@ class CardBloc extends Bloc<CardEvent, CardState> {
     }
   }
 }
-

@@ -5,7 +5,9 @@ abstract class AuthLocalDataSource {
   Future<UserModel> signUp({
     required String email,
     required String password,
-    required String fullName,
+    required String firstName,
+    required String lastName,
+
   });
   Future<UserModel> signIn({required String email, required String password});
   Future<void> signOut();
@@ -21,11 +23,13 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   Future<UserModel> signUp({
     required String email,
     required String password,
-    required String fullName,
+    required String firstName,
+    required String lastName,
   }) => _hiveDBService.signUp(
     email: email,
     password: password,
-    fullName: fullName,
+    firstName: firstName,
+    lastName: lastName,
   );
   @override
   Future<UserModel> signIn({required String email, required String password}) =>

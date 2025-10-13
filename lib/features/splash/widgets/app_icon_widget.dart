@@ -5,10 +5,10 @@ class AppIconWidget extends StatelessWidget {
   final bool showText;
 
   const AppIconWidget({
-    Key? key,
+    super.key,
     this.size = 100,
     this.showText = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,16 @@
 import 'dart:io';
+import 'package:bcode/shared_widgets/default_button.dart';
+import 'package:bcode/shared_widgets/text_fields/default.dart';
+import 'package:bcode/shared_widgets/text_fields/email.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../../../models/business_card_model.dart';
-import '../../../utils/app_colors.dart';
-import '../../../utils/validators.dart';
-import '../../../utils/image_storage.dart';
-import '../../../utils/custom_snackbar.dart';
+import '../../../core/utils/app_colors.dart';
+import '../../../core/utils/validators.dart';
+import '../../../core/utils/image_storage.dart';
+import '../../../core/utils/custom_snackbar.dart';
 import '../bloc/card_bloc.dart';
 import '../bloc/card_event.dart';
 
@@ -16,11 +19,8 @@ class AddCardScreen extends StatefulWidget {
   final String userId;
   final BusinessCardModel? card; // For editing existing card
 
-  const AddCardScreen({
-    Key? key,
-    required this.userId,
-    this.card,
-  }) : super(key: key);
+  const AddCardScreen({Key? key, required this.userId, this.card})
+    : super(key: key);
 
   @override
   State<AddCardScreen> createState() => _AddCardScreenState();
@@ -47,7 +47,7 @@ class _AddCardScreenState extends State<AddCardScreen>
   @override
   void initState() {
     super.initState();
-    
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -57,7 +57,7 @@ class _AddCardScreenState extends State<AddCardScreen>
       curve: Curves.easeInOut,
     );
     _animationController.forward();
-    
+
     if (widget.card != null) {
       _fullNameController.text = widget.card!.fullName;
       _companyNameController.text = widget.card!.companyName;
@@ -86,22 +86,20 @@ class _AddCardScreenState extends State<AddCardScreen>
 
   Future<void> _scanCard() async {
     if (_isScanning) return;
-    
+
     setState(() {
       _isScanning = true;
     });
-    
+
     final ImagePicker picker = ImagePicker();
-    
+
     // Show dialog to choose camera or gallery
     final source = await showDialog<ImageSource>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Scan Business Card'),
         content: const Text('Choose how to capture the card:'),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         actions: [
           TextButton.icon(
             onPressed: () => Navigator.pop(context, ImageSource.camera),
@@ -128,7 +126,7 @@ class _AddCardScreenState extends State<AddCardScreen>
       if (image != null) {
         // Save image to permanent storage
         final String permanentPath = await ImageStorage.saveImage(image.path);
-        
+
         setState(() {
           _imagePath = permanentPath;
           _isScanned = true;
@@ -138,7 +136,9 @@ class _AddCardScreenState extends State<AddCardScreen>
         _fillMockData();
 
         if (mounted) {
-        context.showSuccessSnackBar('Card scanned! Please verify the details.');
+          context.showSuccessSnackBar(
+            'Card scanned! Please verify the details.',
+          );
         }
       }
     } catch (e) {
@@ -184,9 +184,9 @@ class _AddCardScreenState extends State<AddCardScreen>
       context.showWarningSnackBar('Please scan a card first');
       return;
     }
-    
+
     if (_isSaving) return; // Prevent multiple saves
-    
+
     setState(() {
       _isSaving = true;
     });
@@ -248,282 +248,214 @@ class _AddCardScreenState extends State<AddCardScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-            // Scan card button/preview
-            if (!_isScanned)
-              InkWell(
-                onTap: _isScanning ? null : _scanCard,
-                child: Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppColors.primary,
-                      width: 2,
-                      style: BorderStyle.solid,
+              // Scan card button/preview
+              if (!_isScanned)
+                InkWell(
+                  onTap: _isScanning ? null : _scanCard,
+                  child: Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: AppColors.primary,
+                        width: 2,
+                        style: BorderStyle.solid,
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _isScanning
+                            ? SizedBox(
+                                width: 64,
+                                height: 64,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.primary,
+                                  ),
+                                ),
+                              )
+                            : const Icon(
+                                Icons.camera_alt,
+                                size: 64,
+                                color: AppColors.primary,
+                              ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _isScanning
+                              ? 'Scanning...'
+                              : 'Tap to Scan Business Card',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _isScanning
+                              ? 'Please wait while we process your card'
+                              : 'Use camera or select from gallery',
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                )
+              else
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    image: _imagePath != null
+                        ? DecorationImage(
+                            image: FileImage(File(_imagePath!)),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                    color: AppColors.grey,
+                  ),
+                  child: Stack(
                     children: [
-                      _isScanning
-                          ? SizedBox(
-                              width: 64,
-                              height: 64,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 3,
-                                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      if (_imagePath == null)
+                        Center(
+                          child: Container(
+                            width: 100,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: AppColors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: AppColors.white.withOpacity(0.3),
+                                width: 2,
                               ),
-                            )
-                          : const Icon(
-                              Icons.camera_alt,
-                              size: 64,
-                              color: AppColors.primary,
                             ),
-                      const SizedBox(height: 16),
-                      Text(
-                        _isScanning ? 'Scanning...' : 'Tap to Scan Business Card',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.business,
+                                  size: 24,
+                                  color: AppColors.white.withOpacity(0.8),
+                                ),
+                                const SizedBox(height: 4),
+                                Container(
+                                  width: 40,
+                                  height: 3,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Container(
+                                  width: 60,
+                                  height: 3,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _isScanning ? 'Please wait while we process your card' : 'Use camera or select from gallery',
-                        style: const TextStyle(
-                          color: AppColors.textSecondary,
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: IconButton(
+                          icon: _isScanning
+                              ? SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      AppColors.white,
+                                    ),
+                                  ),
+                                )
+                              : const Icon(Icons.camera_alt),
+                          color: AppColors.white,
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                          ),
+                          onPressed: _isScanning ? null : _scanCard,
                         ),
                       ),
                     ],
                   ),
                 ),
-              )
-            else
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  image: _imagePath != null
-                      ? DecorationImage(
-                          image: FileImage(File(_imagePath!)),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                  color: AppColors.grey,
-                ),
-                child: Stack(
+
+              const SizedBox(height: 24),
+
+              // Form
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (_imagePath == null)
-                      Center(
-                        child: Container(
-                          width: 100,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            color: AppColors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: AppColors.white.withOpacity(0.3),
-                              width: 2,
-                            ),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.business,
-                                size: 24,
-                                color: AppColors.white.withOpacity(0.8),
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                width: 40,
-                                height: 3,
-                                decoration: BoxDecoration(
-                                  color: AppColors.white.withOpacity(0.6),
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Container(
-                                width: 60,
-                                height: 3,
-                                decoration: BoxDecoration(
-                                  color: AppColors.white.withOpacity(0.6),
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child:                       IconButton(
-                        icon: _isScanning
-                            ? SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
-                                ),
-                              )
-                            : const Icon(Icons.camera_alt),
-                        color: AppColors.white,
-                        style: IconButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                        ),
-                        onPressed: _isScanning ? null : _scanCard,
-                      ),
+                    DefaultTextField(
+                      _fullNameController,
+                      hint: 'full_name',
+                      icon: Icons.person,
+                      validator: Validators().validateFullName,
+                    ),
+                    const SizedBox(height: 16),
+                    DefaultTextField(
+                      _companyNameController,
+                      hint: 'company_name',
+                      icon: Icons.business,
+                      validator: Validators().validateRequired,
+                    ),
+                    const SizedBox(height: 16),
+                    DefaultTextField(
+                      _jobTitleController,
+                      hint: 'job_title',
+                      icon: Icons.work,
+                      validator: Validators().validateRequired,
+                    ),
+                    const SizedBox(height: 16),
+                    EmailTextField(_emailController),
+                    const SizedBox(height: 16),
+                    DefaultTextField(
+                      _phoneController,
+                      hint: 'phone',
+                      icon: Icons.phone,
+                      keyboardType: TextInputType.phone,
+                      validator: Validators().validatePhone,
+                    ),
+                    const SizedBox(height: 16),
+                    DefaultTextField(
+                      _websiteController,
+                      hint: 'website_(Optional)',
+                      icon: Icons.language,
+                      keyboardType: TextInputType.url,
+                      validator: Validators().validateUrl,
+                    ),
+                    const SizedBox(height: 16),
+                    DefaultTextField(
+                      _addressController,
+                      hint: 'address_(Optional)',
+                      icon: Icons.location_on,
+                      maxLength: 2,
+                    ),
+                    const SizedBox(height: 24),
+                    DefaultButton(
+                      onPressed: _saveCard,
+                      label: widget.card != null ? 'update_card' : 'save_card',
                     ),
                   ],
                 ),
               ),
-
-            const SizedBox(height: 24),
-
-            // Form
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _buildTextField(
-                    controller: _fullNameController,
-                    label: 'Full Name',
-                    icon: Icons.person,
-                    validator: Validators.validateFullName,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _companyNameController,
-                    label: 'Company Name',
-                    icon: Icons.business,
-                    validator: (v) =>
-                        Validators.validateRequired(v, 'Company name'),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _jobTitleController,
-                    label: 'Job Title',
-                    icon: Icons.work,
-                    validator: (v) =>
-                        Validators.validateRequired(v, 'Job title'),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _emailController,
-                    label: 'Email',
-                    icon: Icons.email,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: Validators.validateEmail,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _phoneController,
-                    label: 'Phone',
-                    icon: Icons.phone,
-                    keyboardType: TextInputType.phone,
-                    validator: Validators.validatePhone,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _websiteController,
-                    label: 'Website (Optional)',
-                    icon: Icons.language,
-                    keyboardType: TextInputType.url,
-                    validator: Validators.validateUrl,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTextField(
-                    controller: _addressController,
-                    label: 'Address (Optional)',
-                    icon: Icons.location_on,
-                    maxLines: 2,
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Save button
-                  ElevatedButton(
-                    onPressed: _isSaving ? null : _saveCard,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 2,
-                    ),
-                    child: _isSaving
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                widget.card != null ? 'Updating...' : 'Saving...',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          )
-                        : Text(
-                            widget.card != null ? 'Update Card' : 'Save Card',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      validator: validator,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        filled: true,
-        fillColor: AppColors.white,
       ),
     );
   }
 }
-

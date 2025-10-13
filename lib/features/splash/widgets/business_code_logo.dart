@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/app_colors.dart';
+import '../../../core/utils/app_colors.dart';
 
 class BusinessCodeLogo extends StatelessWidget {
   final double? width;
@@ -8,16 +8,16 @@ class BusinessCodeLogo extends StatelessWidget {
   final bool showIcon;
 
   const BusinessCodeLogo({
-    Key? key,
+    super.key,
     this.width,
     this.height,
     this.fontSize = 32,
     this.showIcon = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: width,
       height: height,
       child: Row(
@@ -60,7 +60,7 @@ class BusinessCodeLogo extends StatelessWidget {
   }
 
   Widget _buildIcon() {
-    return Container(
+    return SizedBox(
       width: 48,
       height: 48,
       child: Stack(
@@ -152,14 +152,14 @@ class SplashLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: size,
       height: size,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Icon
-          Container(
+          SizedBox(
             width: size * 0.4,
             height: size * 0.4,
             child: Stack(

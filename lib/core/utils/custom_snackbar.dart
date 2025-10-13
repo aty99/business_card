@@ -1,23 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'app_colors.dart';
+import '../constants/app_constants.dart';
 
-import '../core/constants/app_constants.dart';
-
-/// Custom animated snackbar with different types and animations
-/// 
-/// Usage examples:
-/// ```dart
-/// // Simple usage
-/// context.showSuccessSnackBar('Operation completed!');
-/// context.showErrorSnackBar('Something went wrong!');
-/// 
-/// // With custom duration
-/// context.showWarningSnackBar('Please check your input', duration: Duration(seconds: 5));
-/// 
-/// // Using the main class
-/// CustomSnackBar.showInfo(context, message: 'Information message');
-/// ```
 class CustomSnackBar {
   static const Duration _animationDuration = AppConstants.mediumAnimationDuration;
   static const Duration _displayDuration = AppConstants.snackBarDuration;

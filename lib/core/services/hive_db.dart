@@ -8,12 +8,10 @@ abstract class HiveDBService {
   Future<UserModel> signUp({
     required String email,
     required String password,
-    required String fullName,
+    required String firstName,
+    required String lastName,
   });
-  Future<UserModel> signIn({
-    required String email,
-    required String password,
-  });
+  Future<UserModel> signIn({required String email, required String password});
   Future<void> signOut();
   Future<UserModel?> getCurrentUser();
 }
@@ -21,11 +19,16 @@ abstract class HiveDBService {
 class HiveDBServiceImp implements HiveDBService {
   static const _authBoxDB = 'auth', _currentUserKey = 'current_user_id';
 
-  Future<Box<UserModel>> get _authBox async => Hive.openBox<UserModel>(_authBoxDB);
-  Future<Box<String>> get _userBox async => Hive.openBox<String>(_currentUserKey);
+  Future<Box<UserModel>> get _authBox async =>
+      Hive.openBox<UserModel>(_authBoxDB);
+  Future<Box<String>> get _userBox async =>
+      Hive.openBox<String>(_currentUserKey);
 
   @override
-  Future<UserModel> signIn({required String email, required String password}) async {
+  Future<UserModel> signIn({
+    required String email,
+    required String password,
+  }) async {
     final authBox = await _authBox;
     final userBox = await _userBox;
 
@@ -33,7 +36,8 @@ class HiveDBServiceImp implements HiveDBService {
       (u) => u.email.toLowerCase() == email.toLowerCase(),
     );
     if (user == null) throw Exception('user_does_not_exist'.tr());
-    if (user.password != password) throw Exception('invalid_email_or_password'.tr());
+    if (user.password != password)
+      throw Exception('invalid_email_or_password'.tr());
 
     await userBox.put(_currentUserKey, user.id);
     return user;
@@ -43,12 +47,15 @@ class HiveDBServiceImp implements HiveDBService {
   Future<UserModel> signUp({
     required String email,
     required String password,
-    required String fullName,
+    required String firstName,
+    required String lastName,
   }) async {
     final authBox = await _authBox;
     final userBox = await _userBox;
 
-    if (authBox.values.any((u) => u.email.toLowerCase() == email.toLowerCase())) {
+    if (authBox.values.any(
+      (u) => u.email.toLowerCase() == email.toLowerCase(),
+    )) {
       throw Exception('email_already_registered'.tr());
     }
 
@@ -56,7 +63,8 @@ class HiveDBServiceImp implements HiveDBService {
       id: const Uuid().v4(),
       email: email,
       password: password,
-      fullName: fullName,
+      firstName: firstName,
+      lastName: lastName,
       createdAt: DateTime.now(),
     );
 

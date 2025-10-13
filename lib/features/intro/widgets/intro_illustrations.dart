@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/app_colors.dart';
+import '../../../core/utils/app_colors.dart';
 
 class IntroIllustrations {
   static Widget getIllustration(String illustrationType, {double? width, double? height}) {
@@ -17,7 +17,7 @@ class IntroIllustrations {
 
   // First intro illustration - Person holding a card
   static Widget _buildIntro1Illustration({double? width, double? height}) {
-    return Container(
+    return SizedBox(
       width: width ?? 280,
       height: height ?? 200,
       child: Stack(
@@ -26,7 +26,7 @@ class IntroIllustrations {
           Positioned(
             left: 80,
             top: 40,
-            child: Container(
+            child: SizedBox(
               width: 80,
               height: 120,
               child: CustomPaint(
@@ -121,7 +121,7 @@ class IntroIllustrations {
           Positioned(
             left: 60,
             bottom: 20,
-            child: Container(
+            child: SizedBox(
               width: 16,
               height: 20,
               child: CustomPaint(
@@ -132,7 +132,7 @@ class IntroIllustrations {
           Positioned(
             right: 60,
             bottom: 30,
-            child: Container(
+            child: SizedBox(
               width: 12,
               height: 16,
               child: CustomPaint(
@@ -147,7 +147,7 @@ class IntroIllustrations {
 
   // Second intro illustration - Phone with card and person
   static Widget _buildIntro2Illustration({double? width, double? height}) {
-    return Container(
+    return SizedBox(
       width: width ?? 280,
       height: height ?? 200,
       child: Stack(
@@ -242,7 +242,7 @@ class IntroIllustrations {
           Positioned(
             right: 80,
             top: 50,
-            child: Container(
+            child: SizedBox(
               width: 60,
               height: 100,
               child: CustomPaint(
@@ -278,7 +278,7 @@ class IntroIllustrations {
           Positioned(
             left: 50,
             bottom: 20,
-            child: Container(
+            child: SizedBox(
               width: 12,
               height: 16,
               child: CustomPaint(
@@ -289,7 +289,7 @@ class IntroIllustrations {
           Positioned(
             right: 50,
             bottom: 30,
-            child: Container(
+            child: SizedBox(
               width: 10,
               height: 12,
               child: CustomPaint(
@@ -304,7 +304,7 @@ class IntroIllustrations {
 
   // Third intro illustration - Two people sharing
   static Widget _buildIntro3Illustration({double? width, double? height}) {
-    return Container(
+    return SizedBox(
       width: width ?? 280,
       height: height ?? 200,
       child: Stack(
@@ -313,7 +313,7 @@ class IntroIllustrations {
           Positioned(
             left: 60,
             top: 50,
-            child: Container(
+            child: SizedBox(
               width: 60,
               height: 100,
               child: CustomPaint(
@@ -325,7 +325,7 @@ class IntroIllustrations {
           Positioned(
             right: 60,
             top: 50,
-            child: Container(
+            child: SizedBox(
               width: 60,
               height: 100,
               child: CustomPaint(
@@ -346,7 +346,7 @@ class IntroIllustrations {
                 color: Colors.white,
               ),
               child: Center(
-                child: Container(
+                child: SizedBox(
                   width: 40,
                   height: 30,
                   child: CustomPaint(
@@ -360,7 +360,7 @@ class IntroIllustrations {
           Positioned(
             left: 40,
             bottom: 20,
-            child: Container(
+            child: SizedBox(
               width: 12,
               height: 16,
               child: CustomPaint(
@@ -371,7 +371,7 @@ class IntroIllustrations {
           Positioned(
             right: 40,
             bottom: 20,
-            child: Container(
+            child: SizedBox(
               width: 12,
               height: 16,
               child: CustomPaint(
