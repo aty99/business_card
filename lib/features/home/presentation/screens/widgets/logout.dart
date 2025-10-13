@@ -115,6 +115,8 @@ void showLogoutDialog(BuildContext context) {
                     child: ElevatedButton(
                       onPressed: () async {
                         Navigator.pop(dialogContext);
+                        // Close the drawer if it's open
+                        Navigator.pop(context);
                         context.read<AuthBloc>().add(const SignOutRequested());
                       },
                       style: ElevatedButton.styleFrom(

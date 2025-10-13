@@ -20,9 +20,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    final authState = context.watch<AuthBloc>().state;
-    final isLoggedIn = authState is Authenticated;
-    return Scaffold(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, authState) {
+        // No navigation needed - user stays on home screen after logout
+        // The UI will automatically update to show login options in the drawer
+      },
+      child: Builder(
+        builder: (context) {
+          final authState = context.watch<AuthBloc>().state;
+          final isLoggedIn = authState is Authenticated;
+          
+          return Scaffold(
       backgroundColor: AppColors.background,
       endDrawer: Drawer(
         child: SafeArea(
@@ -128,6 +136,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
       ),
       body: AllCardsScreen(),
+          );
+        },
+      ),
     );
   }
 }

@@ -5,6 +5,7 @@ import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/animated_page_route.dart';
 import '../../../../core/utils/custom_snackbar.dart';
 import '../../../../shared_widgets/text_fields/default.dart';
+import '../../../home/presentation/screens/home_screen.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -88,7 +89,12 @@ class _SignInScreenState extends State<SignInScreen>
           if (state is AuthError) {
             context.showErrorSnackBar(state.message);
           } else if (state is Authenticated) {
-            Navigator.pop(context);
+            // Navigate to home screen and clear the navigation stack
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false,
+            );
           }
         },
         builder: (context, state) {
