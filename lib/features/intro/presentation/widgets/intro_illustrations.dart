@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/utils/app_colors.dart';
+import '../../../../core/utils/app_colors.dart';
 
 class IntroIllustrations {
   static Widget getIllustration(String illustrationType, {double? width, double? height}) {

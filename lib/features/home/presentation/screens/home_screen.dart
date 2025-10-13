@@ -1,14 +1,14 @@
-import 'package:bcode/core/utils/animated_page_route.dart';
-import 'package:bcode/features/auth/presentation/screens/sign_in_screen.dart';
-import 'package:bcode/features/cards/screens/all_cards.dart';
-import 'package:bcode/features/home/presentation/screens/widgets/drawer_item.dart';
-import 'package:bcode/features/home/presentation/screens/widgets/logout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/utils/app_colors.dart';
+import '../../../../core/utils/animated_page_route.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../auth/presentation/screens/sign_in_screen.dart';
+import '../../../cards/presentation/screens/all_cards_screen.dart';
+import 'widgets/drawer_item.dart';
+import 'widgets/logout.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

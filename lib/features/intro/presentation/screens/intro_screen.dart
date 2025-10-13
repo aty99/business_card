@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
-import '../../../models/intro_model.dart';
-import '../widgets/intro_illustrations.dart';
-import '../../../core/utils/app_colors.dart';
-import '../../../core/utils/intro_helper.dart';
+import '../../../../core/models/intro_model.dart';
+import '../../../../core/utils/app_colors.dart';
+import '../../../../core/utils/intro_helper.dart';
+import '../../../../core/data/intro_data.dart';
 
 class IntroScreen extends StatefulWidget {
   final VoidCallback onComplete;
@@ -167,10 +167,10 @@ class _IntroScreenState extends State<IntroScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Illustration
-          IntroIllustrations.getIllustration(
-            intro.illustration,
+          SizedBox(
             width: 280,
             height: 200,
+            child: intro.illustration,
           ),
 
           const SizedBox(height: 40),
@@ -228,7 +228,6 @@ class _IntroScreenState extends State<IntroScreen>
   }
 
   Widget _buildActionButton() {
-    final intro = IntroData.introScreens[_currentPage];
     final isLastPage = _currentPage == IntroData.introScreens.length - 1;
 
     return Padding(
@@ -256,7 +255,7 @@ class _IntroScreenState extends State<IntroScreen>
             borderRadius: BorderRadius.circular(28),
             child: Center(
               child: Text(
-                intro.buttonText.tr(),
+                isLastPage ? 'get_started'.tr() : 'next'.tr(),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 18,

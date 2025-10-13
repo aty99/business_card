@@ -97,7 +97,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                             hint: 'first_name',
                                             _firstNameController,
                                             validator:
-                                                Validators().validateFullName,
+                                                Validators.validateFullName,
                                           ),
                                         ),
                                         SizedBox(width: 8.0),
@@ -106,7 +106,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                             hint: 'last_name',
                                             _lastNameController,
                                             validator:
-                                                Validators().validateFullName,
+                                                Validators.validateFullName,
                                           ),
                                         ),
                                       ],
@@ -122,7 +122,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                                       _confirmPasswordController,
                                       hint: 'confirm_password',
                                       validator: (v) =>
-                                          Validators().validateConfPassword(
+                                          Validators.validateConfPassword(
                                             _passwordController.text,
                                             v,
                                           ),

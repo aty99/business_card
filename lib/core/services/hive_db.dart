@@ -1,11 +1,13 @@
 import 'package:bcode/features/auth/data/model/user_model.dart';
-import 'package:bcode/models/business_card_model.dart';
+import 'package:bcode/features/cards/data/model/business_card_model.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 abstract class HiveDBService {
+  Future<void> init();
+  Future<Box<T>> getBox<T>(String boxName);
   Future<UserModel> signUp({
     required String email,
     required String password,
@@ -34,6 +36,22 @@ class HiveDBServiceImp implements HiveDBService {
       Hive.openBox<String>(_currentUserKey);
   Future<Box<BusinessCardModel>> get _cardBox async =>
       Hive.openBox<BusinessCardModel>(_cardBoxDB);
+
+  @override
+  Future<void> init() async {
+    // Open all required boxes
+    await _authBox;
+    await _userBox;
+    await _cardBox;
+  }
+
+  @override
+  Future<Box<T>> getBox<T>(String boxName) async {
+    if (Hive.isBoxOpen(boxName)) {
+      return Hive.box<T>(boxName);
+    }
+    return await Hive.openBox<T>(boxName);
+  }
 
   @override
   Future<UserModel> signIn({

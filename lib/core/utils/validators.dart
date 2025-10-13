@@ -2,8 +2,27 @@ import 'package:easy_localization/easy_localization.dart';
 
 /// Validation utilities for form fields
 class Validators {
+  /// Validate name
+  static String? validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name is required';
+    }
+    if (value.length < 2) {
+      return 'Name must be at least 2 characters';
+    }
+    return null;
+  }
+
+  /// Validate required field
+  static String? validateRequired(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'This field is required';
+    }
+    return null;
+  }
+
   /// Validate email format
-  String? validateEmail(String? value) {
+  static String? validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Email is required';
     }
@@ -20,7 +39,7 @@ class Validators {
   }
 
   /// Validate password
-  String? validatePassword(String? value) {
+  static String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required';
     }
@@ -33,7 +52,7 @@ class Validators {
   }
 
   /// Validate full name
-  String? validateFullName(String? value) {
+  static String? validateFullName(String? value) {
     if (value == null || value.isEmpty) {
       return 'name_is_required'.tr();
     }
@@ -46,7 +65,7 @@ class Validators {
   }
 
   /// Validate phone number
-  String? validatePhone(String? value) {
+  static String? validatePhone(String? value) {
     if (value == null || value.isEmpty) {
       return 'Phone number is required';
     }
@@ -59,16 +78,8 @@ class Validators {
     return null;
   }
 
-  /// Validate required field
-  String? validateRequired(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'filed_is_required'.tr();
-    }
-    return null;
-  }
-
   /// Validate URL
-  String? validateUrl(String? value) {
+  static String? validateUrl(String? value) {
     if (value == null || value.isEmpty) {
       return null; // URL is optional
     }
@@ -84,7 +95,7 @@ class Validators {
     return null;
   }
 
-  String? validateConfPassword(String? password, String? confPassword) {
+  static String? validateConfPassword(String? password, String? confPassword) {
     if (password == null || password.isEmpty || password != confPassword) {
       return tr("does_not_match_with_password");
     } else {

@@ -81,6 +81,38 @@ class BusinessCardModel extends HiveObject {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'fullName': fullName,
+      'companyName': companyName,
+      'jobTitle': jobTitle,
+      'email': email,
+      'phone': phone,
+      'website': website,
+      'address': address,
+      'imagePath': imagePath,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  factory BusinessCardModel.fromJson(Map<String, dynamic> json) {
+    return BusinessCardModel(
+      id: json['id'] as String,
+      userId: json['userId'] as String,
+      fullName: json['fullName'] as String,
+      companyName: json['companyName'] as String,
+      jobTitle: json['jobTitle'] as String,
+      email: json['email'] as String,
+      phone: json['phone'] as String,
+      website: json['website'] as String?,
+      address: json['address'] as String?,
+      imagePath: json['imagePath'] as String?,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+    );
+  }
+
   @override
   String toString() {
     return 'BusinessCardModel(id: $id, fullName: $fullName, companyName: $companyName, jobTitle: $jobTitle)';

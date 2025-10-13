@@ -1,10 +1,9 @@
-import 'package:bcode/features/home/presentation/screens/home_screen.dart';
-import 'package:bcode/features/intro/screens/intro_screen.dart';
-import 'package:bcode/features/splash/screens/splash_screen.dart';
-import 'package:bcode/core/utils/app_colors.dart';
-import 'package:bcode/core/utils/intro_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import '../../../../core/utils/app_colors.dart';
+import '../../../../core/utils/intro_helper.dart';
+import '../../../home/presentation/screens/home_screen.dart';
+import '../../../intro/presentation/screens/intro_screen.dart';
+import 'splash_screen.dart';
 
 class InitPage extends StatefulWidget {
   const InitPage({super.key});

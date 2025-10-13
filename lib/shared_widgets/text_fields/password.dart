@@ -25,7 +25,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscurePassword,
-      validator: widget.validator ?? Validators().validatePassword,
+      validator: widget.validator ?? Validators.validatePassword,
       decoration: InputDecoration(
         labelText: widget.hint.tr(),
         prefixIcon: const Icon(Icons.lock_outlined),
