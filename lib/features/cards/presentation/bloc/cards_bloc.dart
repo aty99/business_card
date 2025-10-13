@@ -21,6 +21,11 @@ class CardsBloc extends Bloc<CardsEvent, CardsState> {
   ) async {
     emit(CardsLoading());
     try {
+      if (event.userId.isEmpty) {
+        // If no user ID, return empty list
+        emit(const CardsLoaded([]));
+        return;
+      }
       final cards = await cardsRepository.getAllCards(event.userId);
       emit(CardsLoaded(cards));
     } catch (e) {

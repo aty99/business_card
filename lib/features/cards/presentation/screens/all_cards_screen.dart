@@ -67,6 +67,9 @@ class _AllCardsScreenState extends State<AllCardsScreen>
     final authState = context.read<AuthBloc>().state;
     if (authState is Authenticated) {
       context.read<CardsBloc>().add(LoadCards(authState.user.id));
+    } else {
+      // If user is not authenticated, emit empty cards state
+      context.read<CardsBloc>().add(LoadCards(''));
     }
   }
 
@@ -276,7 +279,7 @@ class _AllCardsScreenState extends State<AllCardsScreen>
           }
         },
         builder: (context, state) {
-          if (state is CardsLoading) {
+          if (state is CardsLoading || state is CardsInitial) {
             return context.loadingIndicator();
           }
 
