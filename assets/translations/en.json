@@ -21,6 +21,8 @@
     "password": "Password",
     "confirm_password": "Confirm Password",
     "full_name": "Full Name",
+    "first_name": "First Name",
+    "last_name": "Last Name",
     "forgot_password": "Forgot Password?",
     "dont_have_account": "Don't have an account?",
     "already_have_account": "Already have an account?",

@@ -5,6 +5,7 @@ import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/utils/animated_page_route.dart';
 import '../../../../core/utils/custom_snackbar.dart';
+import '../../../../shared_widgets/text_fields/default.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -65,23 +66,26 @@ class _SignUpScreenState extends State<SignUpScreen>
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          Row(
-            children: [
-              Text(
-                context.locale.languageCode == 'en' ? 'AR' : 'EN',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+          GestureDetector(
+            onTap: () => _changeLanguage(context),
+            child: Row(
+              children: [
+                Text(
+                  context.locale.languageCode == 'en' ? 'AR' : 'EN',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              Icon(
-                Icons.text_fields,
-                color: AppColors.primary,
-                size: 20,
-              ),
-            ],
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.text_fields,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ],
+            ),
           ),
           const SizedBox(width: 16),
         ],
@@ -111,7 +115,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                   
                   // Sign Up Title
                   Text(
-                    'إنشاء حساب',
+                    'sign_up'.tr(),
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -131,24 +135,18 @@ class _SignUpScreenState extends State<SignUpScreen>
                         Row(
                           children: [
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  _buildFieldLabel('الاسم الأول'),
-                                  const SizedBox(height: 8),
-                                  _buildNameField(_firstNameController, 'الاسم الأول'),
-                                ],
+                              child: DefaultTextField(
+                                _firstNameController,
+                                hint: 'first_name',
+                                validator: Validators.validateFullName,
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  _buildFieldLabel('الاسم الأخير'),
-                                  const SizedBox(height: 8),
-                                  _buildNameField(_lastNameController, 'الاسم الأخير'),
-                                ],
+                              child: DefaultTextField(
+                                _lastNameController,
+                                hint: 'last_name',
+                                validator: Validators.validateFullName,
                               ),
                             ),
                           ],
@@ -157,23 +155,33 @@ class _SignUpScreenState extends State<SignUpScreen>
                         const SizedBox(height: 24),
                         
                         // Email Field
-                        _buildFieldLabel('بريد إلكتروني'),
-                        const SizedBox(height: 8),
-                        _buildEmailField(),
+                        DefaultTextField(
+                          _emailController,
+                          hint: 'email',
+                          keyboardType: TextInputType.emailAddress,
+                          validator: Validators.validateEmail,
+                        ),
                         
                         const SizedBox(height: 24),
                         
                         // Password Field
-                        _buildFieldLabel('كلمة السر'),
-                        const SizedBox(height: 8),
-                        _buildPasswordField(),
+                        DefaultTextField(
+                          _passwordController,
+                          hint: 'password',
+                          validator: Validators.validatePassword,
+                        ),
                         
                         const SizedBox(height: 24),
                         
                         // Confirm Password Field
-                        _buildFieldLabel('تأكيد كلمة السر'),
-                        const SizedBox(height: 8),
-                        _buildConfirmPasswordField(),
+                        DefaultTextField(
+                          _confirmPasswordController,
+                          hint: 'confirm_password',
+                          validator: (value) => Validators.validateConfPassword(
+                            _passwordController.text,
+                            value,
+                          ),
+                        ),
                         
                         const SizedBox(height: 32),
                         
@@ -265,132 +273,6 @@ class _SignUpScreenState extends State<SignUpScreen>
     );
   }
 
-  Widget _buildFieldLabel(String label) {
-    return Text(
-      label,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: Colors.black87,
-      ),
-    );
-  }
-
-  Widget _buildNameField(TextEditingController controller, String hint) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: TextFormField(
-        controller: controller,
-        textDirection: TextDirection.rtl,
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 14,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-        validator: Validators.validateFullName,
-      ),
-    );
-  }
-
-  Widget _buildEmailField() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: TextFormField(
-        controller: _emailController,
-        keyboardType: TextInputType.emailAddress,
-        textDirection: TextDirection.ltr,
-        decoration: InputDecoration(
-          hintText: 'ex:example@mail.com..',
-          hintStyle: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 14,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-        validator: Validators.validateEmail,
-      ),
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: TextFormField(
-        controller: _passwordController,
-        obscureText: true,
-        textDirection: TextDirection.rtl,
-        decoration: InputDecoration(
-          hintText: 'ادخل كلمة المرور....',
-          hintStyle: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 14,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          filled: true,
-          fillColor: Colors.white,
-          suffixIcon: Icon(
-            Icons.visibility_off,
-            color: Colors.grey.shade400,
-            size: 20,
-          ),
-        ),
-        validator: Validators.validatePassword,
-      ),
-    );
-  }
-
-  Widget _buildConfirmPasswordField() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: TextFormField(
-        controller: _confirmPasswordController,
-        obscureText: true,
-        textDirection: TextDirection.rtl,
-        decoration: InputDecoration(
-          hintText: 'تأكيد كلمة المرور....',
-          hintStyle: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 14,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          filled: true,
-          fillColor: Colors.white,
-          suffixIcon: Icon(
-            Icons.visibility_off,
-            color: Colors.grey.shade400,
-            size: 20,
-          ),
-        ),
-        validator: (value) => Validators.validateConfPassword(
-          _passwordController.text,
-          value,
-        ),
-      ),
-    );
-  }
 
   Widget _buildSignUpButton(AuthState state) {
     final isLoading = state is AuthLoading;
@@ -424,9 +306,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                       color: Colors.white,
                     ),
                   )
-                : const Text(
-                    'إنشاء حساب',
-                    style: TextStyle(
+                : Text(
+                    'sign_up'.tr(),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -443,7 +325,7 @@ class _SignUpScreenState extends State<SignUpScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'لديك حساب بالفعل؟ ',
+          'already_have_account'.tr(),
           style: TextStyle(
             color: Colors.grey.shade600,
             fontSize: 14,
@@ -457,7 +339,7 @@ class _SignUpScreenState extends State<SignUpScreen>
             );
           },
           child: Text(
-            'تسجيل الدخول',
+            'sign_in'.tr(),
             style: TextStyle(
               color: AppColors.primary,
               fontSize: 14,
@@ -480,5 +362,14 @@ class _SignUpScreenState extends State<SignUpScreen>
         ),
       );
     }
+  }
+
+  void _changeLanguage(BuildContext context) {
+    final currentLocale = context.locale;
+    final newLocale = currentLocale.languageCode == 'en' 
+        ? const Locale('ar') 
+        : const Locale('en');
+    
+    EasyLocalization.of(context)!.setLocale(newLocale);
   }
 }

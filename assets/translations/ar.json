@@ -21,6 +21,8 @@
     "password": "كلمة المرور",
     "confirm_password": "تأكيد كلمة المرور",
     "full_name": "الاسم الكامل",
+    "first_name": "الاسم الأول",
+    "last_name": "الاسم الأخير",
     "forgot_password": "نسيت كلمة المرور؟",
     "dont_have_account": "ليس لديك حساب؟",
     "already_have_account": "لديك حساب بالفعل؟",

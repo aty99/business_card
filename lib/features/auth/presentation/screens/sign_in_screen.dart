@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/animated_page_route.dart';
 import '../../../../core/utils/custom_snackbar.dart';
+import '../../../../shared_widgets/text_fields/default.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -58,23 +59,26 @@ class _SignInScreenState extends State<SignInScreen>
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          Row(
-            children: [
-              Text(
-                context.locale.languageCode == 'en' ? 'AR' : 'EN',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+          GestureDetector(
+            onTap: () => _changeLanguage(context),
+            child: Row(
+              children: [
+                Text(
+                  context.locale.languageCode == 'en' ? 'AR' : 'EN',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              Icon(
-                Icons.text_fields,
-                color: AppColors.primary,
-                size: 20,
-              ),
-            ],
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.text_fields,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ],
+            ),
           ),
           const SizedBox(width: 16),
         ],
@@ -103,7 +107,7 @@ class _SignInScreenState extends State<SignInScreen>
                   
                   // Login Title
                   Text(
-                    'تسجيل الدخول',
+                    'sign_in'.tr(),
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -120,16 +124,31 @@ class _SignInScreenState extends State<SignInScreen>
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         // Email Field
-                        _buildFieldLabel('بريد إلكتروني'),
-                        const SizedBox(height: 8),
-                        _buildEmailField(),
+                        DefaultTextField(
+                          _emailController,
+                          hint: 'email',
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Email is required';
+                            }
+                            return null;
+                          },
+                        ),
                         
                         const SizedBox(height: 24),
                         
                         // Password Field
-                        _buildFieldLabel('كلمة السر'),
-                        const SizedBox(height: 8),
-                        _buildPasswordField(),
+                        DefaultTextField(
+                          _passwordController,
+                          hint: 'password',
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Password is required';
+                            }
+                            return null;
+                          },
+                        ),
                         
                         const SizedBox(height: 16),
                         
@@ -226,83 +245,8 @@ class _SignInScreenState extends State<SignInScreen>
     );
   }
 
-  Widget _buildFieldLabel(String label) {
-    return Text(
-      label,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: Colors.black87,
-      ),
-    );
-  }
 
-  Widget _buildEmailField() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: TextFormField(
-        controller: _emailController,
-        keyboardType: TextInputType.emailAddress,
-        textDirection: TextDirection.ltr,
-        decoration: InputDecoration(
-          hintText: 'ex:example@mail.com..',
-          hintStyle: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 14,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          filled: true,
-          fillColor: Colors.white,
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Email is required';
-          }
-          return null;
-        },
-      ),
-    );
-  }
 
-  Widget _buildPasswordField() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: TextFormField(
-        controller: _passwordController,
-        obscureText: true,
-        textDirection: TextDirection.rtl,
-        decoration: InputDecoration(
-          hintText: 'ادخل كلمة المرور....',
-          hintStyle: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 14,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          filled: true,
-          fillColor: Colors.white,
-          suffixIcon: Icon(
-            Icons.visibility_off,
-            color: Colors.grey.shade400,
-            size: 20,
-          ),
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Password is required';
-          }
-          return null;
-        },
-      ),
-    );
-  }
 
   Widget _buildForgotPasswordLink() {
     return GestureDetector(
@@ -310,7 +254,7 @@ class _SignInScreenState extends State<SignInScreen>
         // TODO: Implement forgot password
       },
       child: Text(
-        'هل نسيت كلمة السر؟',
+        'forgot_password'.tr(),
         style: TextStyle(
           color: AppColors.primary,
           fontSize: 14,
@@ -352,9 +296,9 @@ class _SignInScreenState extends State<SignInScreen>
                       color: Colors.white,
                     ),
                   )
-                : const Text(
-                    'سجل دخول',
-                    style: TextStyle(
+                : Text(
+                    'sign_in'.tr(),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -371,7 +315,7 @@ class _SignInScreenState extends State<SignInScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'ليس لديك حساب؟ ',
+          'dont_have_account'.tr(),
           style: TextStyle(
             color: Colors.grey.shade600,
             fontSize: 14,
@@ -385,7 +329,7 @@ class _SignInScreenState extends State<SignInScreen>
             );
           },
           child: Text(
-            'انشاء حساب',
+            'create_account'.tr(),
             style: TextStyle(
               color: AppColors.primary,
               fontSize: 14,
@@ -406,5 +350,14 @@ class _SignInScreenState extends State<SignInScreen>
         ),
       );
     }
+  }
+
+  void _changeLanguage(BuildContext context) {
+    final currentLocale = context.locale;
+    final newLocale = currentLocale.languageCode == 'en' 
+        ? const Locale('ar') 
+        : const Locale('en');
+    
+    EasyLocalization.of(context)!.setLocale(newLocale);
   }
 }
