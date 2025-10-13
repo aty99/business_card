@@ -1,4 +1,5 @@
 import 'package:bcode/features/auth/data/model/user_model.dart';
+import 'package:bcode/models/business_card_model.dart';
 import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:hive/hive.dart';
@@ -14,15 +15,25 @@ abstract class HiveDBService {
   Future<UserModel> signIn({required String email, required String password});
   Future<void> signOut();
   Future<UserModel?> getCurrentUser();
+  Future<BusinessCardModel> saveCard(BusinessCardModel card);
+  Future<List<BusinessCardModel>> getCardsByUserId(String userId);
+  Future<BusinessCardModel?> getCardById(String cardId);
+  Future<BusinessCardModel> updateCard(BusinessCardModel card);
+  Future<void> deleteCard(String cardId);
+  Future<List<BusinessCardModel>> getAllCards();
 }
 
 class HiveDBServiceImp implements HiveDBService {
-  static const _authBoxDB = 'auth', _currentUserKey = 'current_user_id';
+  static const _authBoxDB = 'auth',
+      _currentUserKey = 'current_user_id',
+      _cardBoxDB = 'business_cards';
 
   Future<Box<UserModel>> get _authBox async =>
       Hive.openBox<UserModel>(_authBoxDB);
   Future<Box<String>> get _userBox async =>
       Hive.openBox<String>(_currentUserKey);
+  Future<Box<BusinessCardModel>> get _cardBox async =>
+      Hive.openBox<BusinessCardModel>(_cardBoxDB);
 
   @override
   Future<UserModel> signIn({
@@ -36,8 +47,9 @@ class HiveDBServiceImp implements HiveDBService {
       (u) => u.email.toLowerCase() == email.toLowerCase(),
     );
     if (user == null) throw Exception('user_does_not_exist'.tr());
-    if (user.password != password)
+    if (user.password != password) {
       throw Exception('invalid_email_or_password'.tr());
+    }
 
     await userBox.put(_currentUserKey, user.id);
     return user;
@@ -81,5 +93,47 @@ class HiveDBServiceImp implements HiveDBService {
     final authBox = await _authBox;
     final id = (await _userBox).get(_currentUserKey);
     return id == null ? null : authBox.get(id);
+  }
+
+  @override
+  Future<BusinessCardModel> saveCard(BusinessCardModel card) async {
+    final cardsBox = await _cardBox;
+    await cardsBox.put(card.id, card);
+    return card;
+  }
+
+  @override
+  Future<List<BusinessCardModel>> getCardsByUserId(String userId) async {
+    final cardsBox = await _cardBox;
+
+    return cardsBox.values.where((card) => card.userId == userId).toList();
+  }
+
+  @override
+  Future<BusinessCardModel?> getCardById(String cardId) async {
+    final cardsBox = await _cardBox;
+
+    return cardsBox.get(cardId);
+  }
+
+  @override
+  Future<BusinessCardModel> updateCard(BusinessCardModel card) async {
+    final cardsBox = await _cardBox;
+    await cardsBox.put(card.id, card);
+    return card;
+  }
+
+  @override
+  Future<void> deleteCard(String cardId) async {
+    final cardsBox = await _cardBox;
+
+    await cardsBox.delete(cardId);
+  }
+
+  /// Get all cards (for debugging)
+  Future<List<BusinessCardModel>> getAllCards() async {
+    final cardsBox = await _cardBox;
+
+    return cardsBox.values.toList();
   }
 }
