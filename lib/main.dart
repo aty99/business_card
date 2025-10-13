@@ -55,7 +55,6 @@ class MyApp extends StatelessWidget {
         child: Builder(
           builder: (context) {
             return MaterialApp(
-              key: ValueKey(context.locale.languageCode),
               title: 'Business Card Manager',
               debugShowCheckedModeBanner: false,
               localizationsDelegates: context.localizationDelegates,

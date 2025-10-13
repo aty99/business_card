@@ -370,6 +370,14 @@ class _SignUpScreenState extends State<SignUpScreen>
         ? const Locale('ar') 
         : const Locale('en');
     
-    EasyLocalization.of(context)!.setLocale(newLocale);
+    // Check if language is the same
+    var languageIsSame = (context.locale == const Locale('en') && newLocale.languageCode == 'en') ||
+        (context.locale == const Locale('ar') && newLocale.languageCode == 'ar');
+    
+    if (languageIsSame) return;
+    
+    EasyLocalization.of(context)!.setLocale(newLocale).then((value) {
+      // Language changed successfully
+    });
   }
 }
