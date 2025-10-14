@@ -89,7 +89,10 @@ class _AllCardsScreenState extends State<AllCardsScreen>
                 itemCount: state.cards.length,
                 itemBuilder: (context, index) {
                   final card = state.cards[index];
-                  return CardItem(card);
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: CardItem(card),
+                    );
                 },
               ),
             );

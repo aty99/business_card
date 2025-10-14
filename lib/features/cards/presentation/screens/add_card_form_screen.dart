@@ -175,6 +175,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 validator: Validators.validateRequired,
                 enabled: !_isSaving,
               ),
+              const SizedBox(height: 16),
 
               DefaultTextField(
                 controller: _lastNameController,
@@ -183,6 +184,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 validator: Validators.validateRequired,
                 enabled: !_isSaving,
               ),
+              const SizedBox(height: 16),
 
               DefaultTextField(
                 controller: _jobTitleController,
@@ -191,6 +193,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 validator: Validators.validateRequired,
                 enabled: !_isSaving,
               ),
+              const SizedBox(height: 16),
 
               DefaultTextField(
                 controller: _companyNameController,
@@ -208,6 +211,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 validator: Validators.validatePhone,
                 enabled: !_isSaving,
               ),
+              const SizedBox(height: 16),
 
               DefaultTextField(
                 controller: _emailController,
@@ -217,6 +221,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 validator: Validators.validateEmail,
                 enabled: !_isSaving,
               ),
+              const SizedBox(height: 16),
 
               DefaultTextField(
                 controller: _websiteController,
@@ -225,6 +230,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 keyboardType: TextInputType.url,
                 enabled: !_isSaving,
               ),
+              const SizedBox(height: 16),
 
               DefaultTextField(
                 controller: _addressController,
