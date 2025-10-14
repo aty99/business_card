@@ -341,6 +341,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
                 color: AppColors.black,
+                // fontSize: 12,
               ),
               textAlign: TextAlign.right,
             ),

@@ -23,31 +23,10 @@ class _ScannedCardsState extends State<ScannedCards> {
       floatingActionButton: Container(
         margin: const EdgeInsets.only(right: 16, bottom: 16),
         child: CustomFloatingButton(() async {
-          final result = await Navigator.push(
+          Navigator.push(
             context,
             SlidePageRoute(page: const MobileScannerSimple()),
           );
-          if (result != null) {
-            final dummyCard = BusinessCardModel(
-              firstName: 'Mohamed',
-              secName: 'Ahmed',
-              jobTitle: 'Software Engineer',
-              companyName: 'BCompany',
-              email: 'test@BCompany.com',
-              phone: '+1234567890',
-              address: 'Egypt',
-              website: 'https://google.com',
-              tabId: 0,
-            );
-            if (mounted) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CardFormScreen(existingCard: dummyCard),
-                ),
-              );
-            }
-          }
         }, Icons.qr_code_scanner),
       ),
     );
@@ -58,8 +37,27 @@ class MobileScannerSimple extends StatelessWidget {
   const MobileScannerSimple({super.key});
 
   void _handleBarcode(BarcodeCapture barcodes, BuildContext context) {
-    final barcode = barcodes.barcodes.firstOrNull;
-    Navigator.pop(context, barcode?.rawValue);
+    final result = barcodes.barcodes.firstOrNull;
+    Navigator.of(context).pop();
+    if (result != null) {
+      final dummyCard = BusinessCardModel(
+        firstName: 'Mohamed',
+        secName: 'Ahmed',
+        jobTitle: 'Software Engineer',
+        companyName: 'BCompany',
+        email: 'test@BCompany.com',
+        phone: '+1234567890',
+        address: 'Egypt',
+        website: 'https://google.com',
+        tabId: 0,
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CardFormScreen(existingCard: dummyCard),
+        ),
+      );
+    }
   }
 
   @override
