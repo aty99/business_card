@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/animated_page_route.dart';
 import '../../../../core/widgets/logo_from_image.dart';
+import '../../../../core/utils/image_storage.dart';
+import '../../../../core/utils/custom_snackbar.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/screens/sign_in_screen.dart';
 import '../../../cards/presentation/screens/all_cards_screen.dart';
+import '../../../cards/presentation/screens/add_card_screen.dart';
 import 'widgets/drawer_item.dart';
 import 'widgets/logout.dart';
 
@@ -19,6 +23,43 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  
+  Future<void> _openCameraAndNavigate() async {
+    try {
+      final picker = ImagePicker();
+      final image = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        // Save image to permanent storage
+        final String permanentPath = await ImageStorage.saveImage(image.path);
+        
+        // Get user ID
+        final authState = context.read<AuthBloc>().state;
+        String userId = authState is Authenticated ? authState.user.id : 'guest_user';
+        
+        // Navigate to add card screen with the captured image
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddCardScreen(
+                userId: userId,
+                initialImagePath: permanentPath,
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        context.showErrorSnackBar('Failed to capture image: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
@@ -169,9 +210,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       floatingActionButton: Container(
         margin: const EdgeInsets.only(right: 16, bottom: 16),
         child: FloatingActionButton(
-          onPressed: () {
-            // TODO: Navigate to add card screen
-          },
+          onPressed: _openCameraAndNavigate,
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: Container(

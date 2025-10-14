@@ -15,11 +15,13 @@ import '../bloc/cards_event.dart';
 class AddCardScreen extends StatefulWidget {
   final String userId;
   final BusinessCardModel? card;
+  final String? initialImagePath;
 
   const AddCardScreen({
     super.key,
     required this.userId,
     this.card,
+    this.initialImagePath,
   });
 
   @override
@@ -40,7 +42,6 @@ class _AddCardScreenState extends State<AddCardScreen>
   final _addressController = TextEditingController();
 
   String? _imagePath;
-  bool _isScanned = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -58,7 +59,9 @@ class _AddCardScreenState extends State<AddCardScreen>
       _websiteController.text = widget.card!.website ?? '';
       _addressController.text = widget.card!.address ?? '';
       _imagePath = widget.card!.imagePath;
-      _isScanned = _imagePath != null;
+    } else if (widget.initialImagePath != null) {
+      // If we have an initial image from camera
+      _imagePath = widget.initialImagePath;
     }
 
     _animationController = AnimationController(
@@ -107,7 +110,6 @@ class _AddCardScreenState extends State<AddCardScreen>
         
         setState(() {
           _imagePath = permanentPath;
-          _isScanned = true;
         });
         
         if (mounted) {
@@ -131,7 +133,6 @@ class _AddCardScreenState extends State<AddCardScreen>
     }
     setState(() {
       _imagePath = null;
-      _isScanned = false;
     });
   }
 

@@ -47,12 +47,16 @@ class _AllCardsScreenState extends State<AllCardsScreen>
 
   void _loadCards() {
     final authState = context.read<AuthBloc>().state;
+    String userId;
+    
     if (authState is Authenticated) {
-      context.read<CardsBloc>().add(LoadCards(authState.user.id));
+      userId = authState.user.id;
     } else {
-      // If user is not authenticated, emit empty cards state
-      context.read<CardsBloc>().add(LoadCards(''));
+      // Use guest user ID for non-authenticated users
+      userId = 'guest_user';
     }
+    
+    context.read<CardsBloc>().add(LoadCards(userId));
   }
 
   void _onSearchChanged() {
@@ -60,9 +64,15 @@ class _AllCardsScreenState extends State<AllCardsScreen>
     if (query != _searchQuery) {
       setState(() => _searchQuery = query);
       final authState = context.read<AuthBloc>().state;
+      String userId;
+      
       if (authState is Authenticated) {
-        context.read<CardsBloc>().add(SearchCards(authState.user.id, query));
+        userId = authState.user.id;
+      } else {
+        userId = 'guest_user';
       }
+      
+      context.read<CardsBloc>().add(SearchCards(userId, query));
     }
   }
 
