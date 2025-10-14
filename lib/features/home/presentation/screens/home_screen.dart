@@ -25,15 +25,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _selectedTabIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    // Load initial data when home screen is created
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _refreshCards();
-    });
-  }
-
   /// Refresh cards when switching tabs
   void _refreshCards() {
     final authState = context.read<AuthBloc>().state;
@@ -45,11 +36,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-
     return Builder(
-      builder: (context) {
-        final authState = context.watch<AuthBloc>().state;
-        final isLoggedIn = authState is Authenticated;
+        builder: (context) {
+          final authState = context.watch<AuthBloc>().state;
+          final isLoggedIn = authState is Authenticated;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -161,11 +151,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               children: [
                 InkWell(
                   onTap: () {
-                    setState(() {
-                      _selectedTabIndex = 0;
-                    });
-                    // Force reload cards when switching tabs
-                    _refreshCards();
+                    if (_selectedTabIndex != 0) {
+                      setState(() {
+                        _selectedTabIndex = 0;
+                      });
+                      // Only refresh if tab actually changed
+                      _refreshCards();
+                    }
                   },
                   child: BottomBtn(
                     _selectedTabIndex == 0,
@@ -174,11 +166,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 InkWell(
                   onTap: () {
-                    setState(() {
-                      _selectedTabIndex = 1;
-                    });
-                    // Force reload cards when switching tabs
-                    _refreshCards();
+                    if (_selectedTabIndex != 1) {
+                      setState(() {
+                        _selectedTabIndex = 1;
+                      });
+                      // Only refresh if tab actually changed
+                      _refreshCards();
+                    }
                   },
                   child: BottomBtn(_selectedTabIndex == 1, Icons.camera_alt),
                 ),

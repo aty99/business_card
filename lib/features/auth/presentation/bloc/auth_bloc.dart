@@ -12,6 +12,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignUpRequested>(_onSignUpRequested);
     on<SignInRequested>(_onSignInRequested);
     on<SignOutRequested>(_onSignOutRequested);
+    on<SignOutAndClearData>(_onSignOutAndClearData);
   }
 
   /// Handle checking authentication status
@@ -76,6 +77,21 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     try {
       await authRepository.signOut();
+      emit(const Unauthenticated());
+    } catch (e) {
+      emit(AuthError(e.toString()));
+    }
+  }
+
+  /// Handle user sign out and clear all data
+  Future<void> _onSignOutAndClearData(
+    SignOutAndClearData event,
+    Emitter<AuthState> emit,
+  ) async {
+    try {
+      await authRepository.signOut();
+      // Clear all user data from local storage
+      await authRepository.clearUserData();
       emit(const Unauthenticated());
     } catch (e) {
       emit(AuthError(e.toString()));

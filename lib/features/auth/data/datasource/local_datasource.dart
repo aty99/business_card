@@ -12,6 +12,7 @@ abstract class AuthLocalDataSource {
   Future<UserModel> signIn({required String email, required String password});
   Future<void> signOut();
   Future<UserModel?> getCurrentUser();
+  Future<void> clearUserData();
 }
 
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
@@ -40,4 +41,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<UserModel?> getCurrentUser() => _hiveDBService.getCurrentUser();
+
+  @override
+  Future<void> clearUserData() => _hiveDBService.clearUserData();
 }

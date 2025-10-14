@@ -24,6 +24,7 @@ abstract class HiveDBService {
   Future<void> deleteCard(String cardId);
   Future<List<BusinessCardModel>> getCapturedCards(String userId);
   Future<List<BusinessCardModel>> getScannedCards(String userId);
+  Future<void> clearUserData();
 }
 
 class HiveDBServiceImp implements HiveDBService {
@@ -163,5 +164,26 @@ class HiveDBServiceImp implements HiveDBService {
     return box.values
         .where((card) => card.userId == userId && card.tabId == 1)
         .toList();
+  }
+
+  @override
+  Future<void> clearUserData() async {
+    final userBox = await _userBox;
+    final currentUserId = userBox.get(_currentUserKey);
+    
+    if (currentUserId != null) {
+      // Clear all cards for the current user ONLY
+      final cardsBox = await _cardBox;
+      final userCards = cardsBox.values
+          .where((card) => card.userId == currentUserId)
+          .toList();
+      
+      for (final card in userCards) {
+        await cardsBox.delete(card.id);
+      }
+    }
+    
+    // Clear current user session (but keep user data in auth box)
+    await userBox.delete(_currentUserKey);
   }
 }

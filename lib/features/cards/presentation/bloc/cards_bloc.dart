@@ -24,9 +24,6 @@ class CardsBloc extends Bloc<CardsEvent, CardsState> {
         return;
       }
       
-      // Add a small delay to ensure proper loading
-      await Future.delayed(const Duration(milliseconds: 100));
-      
       final cards = event.type == 0
           ? await cardsRepository.getScannedCards(event.userId)
           : await cardsRepository.getCapturedCards(event.userId);
