@@ -119,12 +119,127 @@ class EmptyStateWidgets {
   static Widget noCards({
     VoidCallback? onAddCard,
   }) {
-    return EmptyStateWidget(
-      title: AppStrings.noCardsFound.tr(),
-      message: AppStrings.noCardsMessage.tr(),
-      icon: Icons.credit_card_outlined,
-      actionText: AppStrings.addCard.tr(),
-      onActionPressed: onAddCard,
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Custom card illustration
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // Back card (blue border)
+              Transform.rotate(
+                angle: -0.05,
+                child: Container(
+                  width: 200,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.cardBorderBlue,
+                      width: 2,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 8, right: 8),
+                        width: 30,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade400,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 8, left: 12),
+                        height: 2,
+                        width: 60,
+                        color: Colors.grey.shade400,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 8, left: 12),
+                        height: 2,
+                        width: 40,
+                        color: Colors.grey.shade400,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Front card (green border)
+              Transform.rotate(
+                angle: 0.05,
+                child: Container(
+                  width: 200,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.cardBorderGreen,
+                      width: 2,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Left side lines
+                          Container(
+                            margin: const EdgeInsets.only(left: 12, bottom: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height: 2,
+                                  width: 60,
+                                  color: Colors.grey.shade400,
+                                  margin: const EdgeInsets.only(bottom: 4),
+                                ),
+                                Container(
+                                  height: 2,
+                                  width: 40,
+                                  color: Colors.grey.shade400,
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Right side QR placeholder
+                          Container(
+                            margin: const EdgeInsets.only(right: 12, bottom: 8),
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade400,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'no_cards_found'.tr(),
+            style: TextStyle(
+              fontSize: 18,
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

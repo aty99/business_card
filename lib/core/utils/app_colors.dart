@@ -30,6 +30,11 @@ class AppColors {
   // Link colors
   static const Color linkBlue = Color(0xFF2196F3);
   
+  // Home screen specific colors
+  static const Color tealPrimary = Color(0xFF26A69A);
+  static const Color cardBorderGreen = Color(0xFF4CAF50);
+  static const Color cardBorderBlue = Color(0xFF2196F3);
+  
   // Neutral colors
   static const Color white = Colors.white;
   static const Color black = Colors.black;

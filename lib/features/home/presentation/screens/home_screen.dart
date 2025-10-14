@@ -85,57 +85,142 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        title: Stack(
           children: [
-            // Search button on the left
-            IconButton(
-              icon: Icon(Icons.search, color: AppColors.textPrimary, size: 24),
-              onPressed: () {},
-            ),
-            const Spacer(),
-            // Business Code logo in center
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Business',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Business',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
                     ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Icon(Icons.code, color: Colors.white, size: 16),
+                  ),
+                  const SizedBox(width: 6,),
+                  Text(
+                    'Code',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF2196F3),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Search button on the left
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                Text(
-                  'Code',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
-                  ),
+                child: IconButton(
+                  icon: Icon(Icons.search, color: AppColors.textPrimary, size: 20),
+                  onPressed: () {},
+                  padding: EdgeInsets.zero,
                 ),
-              ],
+              ),
             ),
-            const Spacer(),
           ],
         ),
       ),
       body: AllCardsScreen(),
+      bottomNavigationBar: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(
+              color: Colors.grey.shade200,
+              width: 1,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            // Left card icon
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFF4CAF50),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.credit_card,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+            // Right card icon
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade400,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.credit_card,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(right: 16, bottom: 16),
+        child: FloatingActionButton(
+          onPressed: () {
+            // TODO: Navigate to add card screen
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xFF4CAF50), // Green
+                  const Color(0xFF2196F3), // Blue
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.qr_code_scanner,
+              color: Colors.white,
+              size: 28,
+            ),
+          ),
+        ),
+      ),
           );
         },
       ),

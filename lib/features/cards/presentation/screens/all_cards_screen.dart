@@ -4,18 +4,14 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/animated_page_route.dart';
 import '../../../../core/utils/custom_snackbar.dart';
-import '../../../../core/widgets/custom_app_bar.dart';
 import '../../../../core/widgets/animated_card.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
-import '../../../../core/constants/app_strings.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
-import '../../../auth/presentation/bloc/auth_event.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../bloc/cards_bloc.dart';
 import '../bloc/cards_event.dart';
 import '../bloc/cards_state.dart';
-import 'add_card_screen.dart';
 import 'card_detail_screen.dart';
 
 /// Screen displaying all saved business cards
@@ -30,10 +26,6 @@ class _AllCardsScreenState extends State<AllCardsScreen>
     with TickerProviderStateMixin {
   final _searchController = TextEditingController();
   late ScrollController _scrollController;
-  late AnimationController _fabAnimationController;
-  late Animation<double> _fabScaleAnimation;
-  bool _isLoggingOut = false;
-  bool _isAddingCard = false;
   String _searchQuery = '';
 
   @override
@@ -42,15 +34,6 @@ class _AllCardsScreenState extends State<AllCardsScreen>
     _loadCards();
 
     _scrollController = ScrollController();
-    _fabAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _fabScaleAnimation = CurvedAnimation(
-      parent: _fabAnimationController,
-      curve: Curves.easeInOut,
-    );
-    _fabAnimationController.forward();
 
     _searchController.addListener(_onSearchChanged);
   }
@@ -59,7 +42,6 @@ class _AllCardsScreenState extends State<AllCardsScreen>
   void dispose() {
     _searchController.dispose();
     _scrollController.dispose();
-    _fabAnimationController.dispose();
     super.dispose();
   }
 
@@ -84,108 +66,6 @@ class _AllCardsScreenState extends State<AllCardsScreen>
     }
   }
 
-  Future<void> _showLogoutDialog() async {
-    return showDialog(
-      context: context,
-      barrierDismissible: !_isLoggingOut,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Text(
-            'logout_confirmation'.tr(),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
-          content: Text(
-            'logout_message'.tr(),
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 16,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: _isLoggingOut ? null : () => Navigator.pop(context),
-              child: Text(
-                'cancel'.tr(),
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: _isLoggingOut
-                  ? null
-                  : () async {
-                      setState(() => _isLoggingOut = true);
-                      try {
-                        context.read<AuthBloc>().add(const SignOutRequested());
-                        if (mounted) {
-                          Navigator.pop(context);
-                        }
-                      } finally {
-                        if (mounted) {
-                          setState(() => _isLoggingOut = false);
-                        }
-                      }
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: AppColors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-              ),
-              child: _isLoggingOut
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.white,
-                      ),
-                    )
-                  : Text(
-                      'logout'.tr(),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _navigateToAddCard() async {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! Authenticated) return;
-
-    setState(() => _isAddingCard = true);
-    try {
-      await Navigator.push(
-        context,
-        SlidePageRoute(
-          page: AddCardScreen(userId: authState.user.id),
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isAddingCard = false);
-      }
-    }
-  }
 
   Future<void> _navigateToCardDetail(dynamic card) async {
     await Navigator.push(
@@ -198,72 +78,12 @@ class _AllCardsScreenState extends State<AllCardsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: CustomAppBar(
-        title: AppStrings.myCards.tr(),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        showBackButton: false,
-        actions: [
-          BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, authState) {
-              if (authState is Authenticated) {
-                return PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert),
-                  onSelected: (value) {
-                    if (value == 'logout') {
-                      _showLogoutDialog();
-                    } else if (value == 'language') {
-                      final newLocale = context.locale.languageCode == 'en'
-                          ? const Locale('ar')
-                          : const Locale('en');
-                      context.setLocale(newLocale);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: 'language',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.language,
-                            color: AppColors.primary,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            context.locale.languageCode == 'en'
-                                ? 'العربية'
-                                : 'English',
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'logout',
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.logout,
-                            color: Colors.red,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'logout'.tr(),
-                            style: const TextStyle(color: Colors.red),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-        ],
-      ),
-      body: BlocConsumer<CardsBloc, CardsState>(
+    return Container(
+      color: AppColors.background,
+      child: Column(
+        children: [
+          Expanded(
+            child: BlocConsumer<CardsBloc, CardsState>(
         listener: (context, state) {
           if (state is CardsError) {
             context.showErrorSnackBar(state.message);
@@ -479,31 +299,8 @@ class _AllCardsScreenState extends State<AllCardsScreen>
           return context.loadingIndicator();
         },
       ),
-      floatingActionButton: ScaleTransition(
-        scale: _fabScaleAnimation,
-        child: FloatingActionButton.extended(
-          onPressed: _isAddingCard ? null : _navigateToAddCard,
-          backgroundColor: _isAddingCard
-              ? AppColors.textSecondary
-              : AppColors.primary,
-          icon: _isAddingCard
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppColors.white,
-                  ),
-                )
-              : const Icon(Icons.add, color: AppColors.white),
-          label: Text(
-            _isAddingCard ? 'adding'.tr() : 'add_card'.tr(),
-            style: const TextStyle(
-              color: AppColors.white,
-              fontWeight: FontWeight.bold,
-            ),
           ),
-        ),
+        ],
       ),
     );
   }
