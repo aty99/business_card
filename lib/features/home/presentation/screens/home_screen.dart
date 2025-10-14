@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/animated_page_route.dart';
+import '../../../../core/widgets/logo_from_image.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/screens/sign_in_screen.dart';
@@ -88,27 +89,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         title: Stack(
           children: [
               Center(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Business',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Code',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF2196F3),
-                      ),
-                    ),
-                  ],
+                child: LogoFromImage(
+                  fontSize: 16,
                 ),
               ),
             // Search button on the left
