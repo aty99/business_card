@@ -5,7 +5,7 @@ import 'package:bcode/features/cards/presentation/screens/all_cards_screen.dart'
 import 'package:bcode/features/cards/presentation/screens/widgets/floating_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../../../../../../core/utils/app_colors.dart';
+import 'package:uuid/uuid.dart';
 
 class ScannedCards extends StatefulWidget {
   const ScannedCards({super.key});
@@ -17,18 +17,20 @@ class ScannedCards extends StatefulWidget {
 class _ScannedCardsState extends State<ScannedCards> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: AllCardsScreen(0), // Same as first page
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(right: 16, bottom: 16),
-        child: CustomFloatingButton(() async {
-          Navigator.push(
-            context,
-            SlidePageRoute(page: const MobileScannerSimple()),
-          );
-        }, Icons.qr_code_scanner),
-      ),
+    return Stack(
+      children: [
+        AllCardsScreen(0), // Same as first page
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: CustomFloatingButton(() async {
+            Navigator.push(
+              context,
+              SlidePageRoute(page: const MobileScannerSimple()),
+            );
+          }, Icons.qr_code_scanner),
+        ),
+      ],
     );
   }
 }
@@ -41,6 +43,7 @@ class MobileScannerSimple extends StatelessWidget {
     Navigator.of(context).pop();
     if (result != null) {
       final dummyCard = BusinessCardModel(
+        id: const Uuid().v4(),
         firstName: 'Mohamed',
         secName: 'Ahmed',
         jobTitle: 'Software Engineer',

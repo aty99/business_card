@@ -10,6 +10,8 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/screens/sign_in_screen.dart';
 import '../../../cards/presentation/screens/captured_cards.dart';
+import '../../../cards/presentation/bloc/cards_bloc.dart';
+import '../../../cards/presentation/bloc/cards_event.dart';
 import 'widgets/drawer_item.dart';
 import 'widgets/logout.dart';
 
@@ -22,6 +24,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int _selectedTabIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load initial data when home screen is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _refreshCards();
+    });
+  }
+
+  /// Refresh cards when switching tabs
+  void _refreshCards() {
+    final authState = context.read<AuthBloc>().state;
+    String userId = authState is Authenticated
+        ? authState.user.id
+        : 'guest_user';
+    context.read<CardsBloc>().add(LoadCards(userId, _selectedTabIndex));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +164,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     setState(() {
                       _selectedTabIndex = 0;
                     });
+                    // Force reload cards when switching tabs
+                    _refreshCards();
                   },
                   child: BottomBtn(
                     _selectedTabIndex == 0,
@@ -155,6 +177,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     setState(() {
                       _selectedTabIndex = 1;
                     });
+                    // Force reload cards when switching tabs
+                    _refreshCards();
                   },
                   child: BottomBtn(_selectedTabIndex == 1, Icons.camera_alt),
                 ),

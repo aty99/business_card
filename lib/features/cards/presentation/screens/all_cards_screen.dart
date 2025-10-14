@@ -21,15 +21,25 @@ class AllCardsScreen extends StatefulWidget {
 }
 
 class _AllCardsScreenState extends State<AllCardsScreen>
-    with TickerProviderStateMixin {
+    with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   final _searchController = TextEditingController();
   late ScrollController _scrollController;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
-    _loadCards();
     _scrollController = ScrollController();
+    // Load cards immediately with a small delay to ensure proper initialization
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (mounted) {
+          _loadCards();
+        }
+      });
+    });
   }
 
   @override
@@ -45,12 +55,17 @@ class _AllCardsScreenState extends State<AllCardsScreen>
     String userId = authState is Authenticated
         ? authState.user.id
         : 'guest_user';
-    context.read<CardsBloc>().add(LoadCards(userId, widget.tabId));
+    
+    // Force reload by adding the event
+    final cardsBloc = context.read<CardsBloc>();
+    cardsBloc.add(LoadCards(userId, widget.tabId));
   }
 
   @override
   /// Build all cards screen UI
   Widget build(BuildContext context) {
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    
     return Container(
       color: AppColors.background,
       child: BlocConsumer<CardsBloc, CardsState>(
@@ -68,8 +83,12 @@ class _AllCardsScreenState extends State<AllCardsScreen>
             _loadCards();
           }
         },
+        buildWhen: (previous, current) {
+          // Always rebuild to ensure proper display
+          return true;
+        },
         builder: (context, state) {
-          if (state is CardsLoading || state is CardsInitial) {
+          if (state is CardsLoading) {
             return context.loadingIndicator();
           }
 
@@ -82,11 +101,13 @@ class _AllCardsScreenState extends State<AllCardsScreen>
               onRefresh: () async => _loadCards(),
               color: AppColors.primary,
               child: ListView.builder(
+                key: PageStorageKey('cards_list_${widget.tabId}'),
                 controller: _scrollController,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 20,
                 ),
+                physics: const AlwaysScrollableScrollPhysics(),
                 itemCount: state.cards.length,
                 itemBuilder: (context, index) {
                   final card = state.cards[index];

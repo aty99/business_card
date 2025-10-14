@@ -5,7 +5,6 @@ import 'package:bcode/features/cards/presentation/screens/widgets/floating_btn.d
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/utils/app_colors.dart';
 import 'add_card_form_screen.dart';
 import 'all_cards_screen.dart';
 
@@ -19,13 +18,15 @@ class CapturedCards extends StatefulWidget {
 class _CapturedCardsState extends State<CapturedCards> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: AllCardsScreen(1), // Same as first page
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(right: 16, bottom: 16),
-        child: CustomFloatingButton(_pickImage, Icons.camera_alt),
-      ),
+    return Stack(
+      children: [
+        AllCardsScreen(1), // Same as first page
+        Positioned(
+          right: 16,
+          bottom: 16,
+          child: CustomFloatingButton(_pickImage, Icons.camera_alt),
+        ),
+      ],
     );
   }
 
