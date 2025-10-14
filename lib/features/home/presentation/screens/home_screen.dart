@@ -127,6 +127,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           } else {
                             context.setLocale(const Locale('en'));
                           }
+                          Navigator.of(context).pop();
                         },
                         title: context.locale == const Locale('ar')
                             ? 'English'
