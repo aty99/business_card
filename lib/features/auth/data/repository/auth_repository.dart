@@ -12,6 +12,7 @@ abstract class AuthRepository {
   Future<UserModel> signIn({required String email, required String password});
   Future<void> signOut();
   Future<UserModel?> getCurrentUser();
+  Future<void> clearUserData();
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -41,4 +42,6 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> signOut() => _authLocalDataSource.signOut();
   @override
   Future<UserModel?> getCurrentUser() => _authLocalDataSource.getCurrentUser();
+  @override
+  Future<void> clearUserData() => _authLocalDataSource.clearUserData();
 }

@@ -50,3 +50,8 @@ class CheckAuthStatus extends AuthEvent {
   const CheckAuthStatus();
 }
 
+/// Event to sign out and clear data
+class SignOutAndClearData extends AuthEvent {
+  const SignOutAndClearData();
+}
+

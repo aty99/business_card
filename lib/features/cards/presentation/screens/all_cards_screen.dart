@@ -24,6 +24,7 @@ class _AllCardsScreenState extends State<AllCardsScreen>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   final _searchController = TextEditingController();
   late ScrollController _scrollController;
+  String? _lastUserId;
 
   @override
   bool get wantKeepAlive => true;
@@ -56,9 +57,12 @@ class _AllCardsScreenState extends State<AllCardsScreen>
         ? authState.user.id
         : 'guest_user';
     
-    // Force reload by adding the event
-    final cardsBloc = context.read<CardsBloc>();
-    cardsBloc.add(LoadCards(userId, widget.tabId));
+    // Only reload if user changed or first time
+    if (_lastUserId != userId) {
+      _lastUserId = userId;
+      final cardsBloc = context.read<CardsBloc>();
+      cardsBloc.add(LoadCards(userId, widget.tabId));
+    }
   }
 
   @override
@@ -68,26 +72,33 @@ class _AllCardsScreenState extends State<AllCardsScreen>
     
     return Container(
       color: AppColors.background,
-      child: BlocConsumer<CardsBloc, CardsState>(
-        listener: (context, state) {
-          if (state is CardsError) {
-            context.showErrorSnackBar(state.message);
-          } else if (state is CardAdded) {
-            context.showSuccessSnackBar('card_saved_successfully'.tr());
-            _loadCards();
-          } else if (state is CardUpdated) {
-            context.showSuccessSnackBar('card_updated_successfully'.tr());
-            _loadCards();
-          } else if (state is CardDeleted) {
-            context.showSuccessSnackBar('card_deleted_successfully'.tr());
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, authState) {
+          // Reload cards when auth state changes (login/logout)
+          if (authState is Unauthenticated || authState is Authenticated) {
             _loadCards();
           }
         },
-        buildWhen: (previous, current) {
-          // Always rebuild to ensure proper display
-          return true;
-        },
-        builder: (context, state) {
+        child: BlocConsumer<CardsBloc, CardsState>(
+          listener: (context, state) {
+            if (state is CardsError) {
+              context.showErrorSnackBar(state.message);
+            } else if (state is CardAdded) {
+              context.showSuccessSnackBar('card_saved_successfully'.tr());
+              _loadCards();
+            } else if (state is CardUpdated) {
+              context.showSuccessSnackBar('card_updated_successfully'.tr());
+              _loadCards();
+            } else if (state is CardDeleted) {
+              context.showSuccessSnackBar('card_deleted_successfully'.tr());
+              _loadCards();
+            }
+          },
+          buildWhen: (previous, current) {
+            // Always rebuild to ensure proper display
+            return true;
+          },
+          builder: (context, state) {
           if (state is CardsLoading) {
             return context.loadingIndicator();
           }
@@ -121,7 +132,8 @@ class _AllCardsScreenState extends State<AllCardsScreen>
           }
 
           return context.loadingIndicator();
-        },
+          },
+        ),
       ),
     );
   }
