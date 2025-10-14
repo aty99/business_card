@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bcode/core/utils/animated_page_route.dart';
 import 'package:bcode/features/cards/data/model/business_card_model.dart';
 import 'package:bcode/features/cards/presentation/screens/add_card_form_screen.dart';
@@ -35,13 +36,47 @@ class _ScannedCardsState extends State<ScannedCards> {
   }
 }
 
-class MobileScannerSimple extends StatelessWidget {
+class MobileScannerSimple extends StatefulWidget {
   const MobileScannerSimple({super.key});
 
-  void _handleBarcode(BarcodeCapture barcodes, BuildContext context) {
+  @override
+  State<MobileScannerSimple> createState() => _MobileScannerSimpleState();
+}
+
+class _MobileScannerSimpleState extends State<MobileScannerSimple> {
+  bool _isProcessing = false;
+  Timer? _debounceTimer;
+  String? _lastScannedCode;
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _handleBarcode(BarcodeCapture barcodes) {
     final result = barcodes.barcodes.firstOrNull;
-    Navigator.of(context).pop();
-    if (result != null) {
+    if (result == null) return;
+
+    final currentCode = result.rawValue;
+    
+    // Prevent processing the same code multiple times
+    if (_lastScannedCode == currentCode || _isProcessing) return;
+    
+    _lastScannedCode = currentCode;
+    _isProcessing = true;
+    
+    // Cancel any existing timer
+    _debounceTimer?.cancel();
+    
+    // Debounce the processing
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      
+      // Close scanner first
+      Navigator.of(context).pop();
+      
+      // Create dummy card
       final dummyCard = BusinessCardModel(
         id: const Uuid().v4(),
         firstName: 'Mohamed',
@@ -54,13 +89,15 @@ class MobileScannerSimple extends StatelessWidget {
         website: 'https://google.com',
         tabId: 0,
       );
+      
+      // Navigate to form screen
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => CardFormScreen(existingCard: dummyCard),
         ),
       );
-    }
+    });
   }
 
   @override
@@ -71,7 +108,7 @@ class MobileScannerSimple extends StatelessWidget {
       body: Stack(
         children: [
           MobileScanner(
-            onDetect: (barcode) => _handleBarcode(barcode, context),
+            onDetect: _handleBarcode,
           ),
         ],
       ),
