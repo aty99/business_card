@@ -7,6 +7,7 @@ import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/utils/image_storage.dart';
 import '../../../../core/utils/custom_snackbar.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../data/model/business_card_model.dart';
 import '../bloc/cards_bloc.dart';
 import '../bloc/cards_event.dart';
@@ -83,13 +84,78 @@ class _AddCardScreenState extends State<AddCardScreen>
   @override
   void dispose() {
     _fullNameController.dispose();
-    _companyNameController.dispose();
-    _jobTitleController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _websiteController.dispose();
-    _addressController.dispose();
-    _animationController.dispose();
+              TextFormField(
+                controller: _fullNameController,
+                decoration: InputDecoration(
+                  labelText: 'Full Name',
+                  hintText: 'Enter full name',
+                  border: OutlineInputBorder(),
+                ),
+              );
+              SizedBox(height: 16);
+              TextFormField(
+                controller: _companyNameController,
+                decoration: InputDecoration(
+                  labelText: 'Company Name',
+                  hintText: 'Enter company name',
+                  border: OutlineInputBorder(),
+                ),
+              );
+              SizedBox(height: 16);
+              TextFormField(
+                controller: _jobTitleController,
+                decoration: InputDecoration(
+                  labelText: 'Job Title',
+                  hintText: 'Enter job title',
+                  border: OutlineInputBorder(),
+                ),
+              );
+              SizedBox(height: 16);
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  hintText: 'Enter email address',
+                  border: OutlineInputBorder(),
+                ),
+              );
+              SizedBox(height: 16);
+              TextFormField(
+                controller: _phoneController,
+                decoration: InputDecoration(
+                  labelText: 'Phone',
+                  hintText: 'Enter phone number',
+                  border: OutlineInputBorder(),
+                ),
+              );
+              SizedBox(height: 16);
+              TextFormField(
+                controller: _websiteController,
+                decoration: InputDecoration(
+                  labelText: 'Website (Optional)',
+                  hintText: 'Enter website URL',
+                  border: OutlineInputBorder(),
+                ),
+              );
+              SizedBox(height: 16);
+              TextFormField(
+                controller: _addressController,
+                decoration: InputDecoration(
+                  labelText: 'Address (Optional)',
+                  hintText: 'Enter address',
+                  border: OutlineInputBorder(),
+                ),
+              );
+              SizedBox(height: 32);
+              ElevatedButton(
+                onPressed: () {
+                  // TODO: Save card logic
+                },
+                child: Text('حفظ البطاقة'),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size(double.infinity, 48),
+                ),
+              );
     super.dispose();
   }
 
@@ -114,14 +180,13 @@ class _AddCardScreenState extends State<AddCardScreen>
         });
         
         if (mounted) {
-          context.showSuccessSnackBar('تم التقاط الصورة بنجاح!');
-          // Navigate to form screen after capturing image
+          context.showSuccessSnackBar('card_image_captured_success'.tr());
           _navigateToFormScreen();
         }
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Failed to capture image: $e');
+  context.showErrorSnackBar('${'failed_to_capture_card_image'.tr()}: $e');
       }
     } finally {
       if (mounted) {
@@ -191,7 +256,7 @@ class _AddCardScreenState extends State<AddCardScreen>
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Failed to save card: $e');
+  context.showErrorSnackBar('${'failed_to_save_card'.tr()}: $e');
       }
     } finally {
       if (mounted) {
@@ -229,7 +294,6 @@ class _AddCardScreenState extends State<AddCardScreen>
                 _buildTextField(
                   controller: _fullNameController,
                   label: 'Full Name',
-                  icon: Icons.person,
                   validator: Validators.validateName,
                 ),
                 const SizedBox(height: 16),
@@ -237,7 +301,6 @@ class _AddCardScreenState extends State<AddCardScreen>
                 _buildTextField(
                   controller: _companyNameController,
                   label: 'Company Name',
-                  icon: Icons.business,
                   validator: Validators.validateRequired,
                 ),
                 const SizedBox(height: 16),
@@ -245,7 +308,6 @@ class _AddCardScreenState extends State<AddCardScreen>
                 _buildTextField(
                   controller: _jobTitleController,
                   label: 'Job Title',
-                  icon: Icons.work,
                   validator: Validators.validateRequired,
                 ),
                 const SizedBox(height: 16),
@@ -253,7 +315,6 @@ class _AddCardScreenState extends State<AddCardScreen>
                 _buildTextField(
                   controller: _emailController,
                   label: 'Email',
-                  icon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                   validator: Validators.validateEmail,
                 ),
@@ -262,7 +323,6 @@ class _AddCardScreenState extends State<AddCardScreen>
                 _buildTextField(
                   controller: _phoneController,
                   label: 'Phone',
-                  icon: Icons.phone,
                   keyboardType: TextInputType.phone,
                   validator: Validators.validatePhone,
                 ),
@@ -271,7 +331,6 @@ class _AddCardScreenState extends State<AddCardScreen>
                 _buildTextField(
                   controller: _websiteController,
                   label: 'Website (Optional)',
-                  icon: Icons.language,
                   keyboardType: TextInputType.url,
                 ),
                 const SizedBox(height: 16),
@@ -279,7 +338,6 @@ class _AddCardScreenState extends State<AddCardScreen>
                 _buildTextField(
                   controller: _addressController,
                   label: 'Address (Optional)',
-                  icon: Icons.location_on,
                   maxLines: 2,
                 ),
                 const SizedBox(height: 32),
@@ -447,7 +505,6 @@ class _AddCardScreenState extends State<AddCardScreen>
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    required IconData icon,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
     int maxLines = 1,
@@ -456,7 +513,6 @@ class _AddCardScreenState extends State<AddCardScreen>
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: AppColors.primary),
         filled: true,
         fillColor: AppColors.white,
         border: OutlineInputBorder(

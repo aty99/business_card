@@ -35,15 +35,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<void> _openCameraAndNavigate() async {
     try {
+      print('Opening gallery...');
       final picker = ImagePicker();
       final image = await picker.pickImage(
-        source: ImageSource.gallery, // Changed to gallery
+        source: ImageSource.gallery, // Gallery
         imageQuality: 85,
       );
 
+      print('Image selected: ${image?.path}');
+      
       if (image != null) {
         // Save image to permanent storage
         final String permanentPath = await ImageStorage.saveImage(image.path);
+        print('Image saved to: $permanentPath');
         
         // Get user ID
         final authState = context.read<AuthBloc>().state;
@@ -61,8 +65,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           );
         }
+      } else {
+        print('No image selected');
       }
     } catch (e) {
+      print('Error opening gallery: $e');
       if (mounted) {
         context.showErrorSnackBar('فشل في اختيار الصورة: $e');
       }
@@ -185,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // Left tab icon (Scan tab)
+            // Left tab icon (Scanner tab)
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -193,22 +200,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 });
               },
               child: Container(
-                width: 40,
-                height: 40,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
-                  color: _selectedTabIndex == 0 
-                      ? const Color(0xFF4CAF50) 
-                      : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(8),
+                  gradient: _selectedTabIndex == 0 
+                      ? LinearGradient(
+                          colors: [
+                            const Color(0xFF2196F3), // Blue
+                            const Color(0xFF4CAF50), // Green
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : LinearGradient(
+                          colors: [
+                            Colors.grey.shade300,
+                            Colors.grey.shade400,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: _selectedTabIndex == 0 ? [
+                    BoxShadow(
+                      color: const Color(0xFF2196F3).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ] : null,
                 ),
                 child: const Icon(
                   Icons.qr_code_scanner,
                   color: Colors.white,
-                  size: 20,
+                  size: 26,
                 ),
               ),
             ),
-            // Right tab icon (Profile tab)
+            // Right tab icon (Camera tab)
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -218,18 +246,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 _navigateToSecondTab();
               },
               child: Container(
-                width: 40,
-                height: 40,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
-                  color: _selectedTabIndex == 1 
-                      ? const Color(0xFF4CAF50) 
-                      : Colors.grey.shade400,
-                  borderRadius: BorderRadius.circular(8),
+                  gradient: _selectedTabIndex == 1 
+                      ? LinearGradient(
+                          colors: [
+                            const Color(0xFF4CAF50), // Green
+                            const Color(0xFF2196F3), // Blue
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : LinearGradient(
+                          colors: [
+                            Colors.grey.shade300,
+                            Colors.grey.shade400,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: _selectedTabIndex == 1 ? [
+                    BoxShadow(
+                      color: const Color(0xFF4CAF50).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ] : null,
                 ),
                 child: const Icon(
                   Icons.camera_alt,
                   color: Colors.white,
-                  size: 20,
+                  size: 24,
                 ),
               ),
             ),
@@ -239,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       floatingActionButton: Container(
         margin: const EdgeInsets.only(right: 16, bottom: 16),
         child: FloatingActionButton(
-          onPressed: _selectedTabIndex == 0 ? _openCameraAndNavigate : null,
+          onPressed: _openCameraAndNavigate,
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: Container(

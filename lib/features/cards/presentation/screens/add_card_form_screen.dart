@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/utils/app_colors.dart';
+import '../../../../shared_widgets/default_text_field.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/utils/custom_snackbar.dart';
 import '../../data/model/business_card_model.dart';
@@ -125,7 +126,7 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('فشل في حفظ البطاقة: $e');
+        context.showErrorSnackBar('${'failed_to_save_card'.tr()}: $e');
       }
     } finally {
       if (mounted) {
@@ -139,12 +140,26 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
     final isEditing = widget.existingCard != null;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(isEditing ? 'تعديل البطاقة' : 'تأكيد إضافة بطاقة جديدة'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
+        backgroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_right, color: Colors.black, size: 28),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          isEditing ? 'edit_card_title'.tr() : 'confirm_add_new_card'.tr(),
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        actions: const [
+          SizedBox(width: 48), // Space for balance
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -154,69 +169,70 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Form Fields
-              _buildTextField(
+              DefaultTextField(
                 controller: _firstNameController,
-                label: 'الاسم الأول',
-                hint: 'أدخل الاسم الأول',
+                label: 'first_name'.tr(),
+                hint: 'enter_first_name'.tr(),
                 validator: Validators.validateRequired,
+                enabled: !_isSaving,
               ),
-              const SizedBox(height: 16),
 
-              _buildTextField(
+              DefaultTextField(
                 controller: _lastNameController,
-                label: 'الاسم الثاني',
-                hint: 'أدخل الاسم الثاني',
+                label: 'second_name'.tr(),
+                hint: 'enter_second_name'.tr(),
                 validator: Validators.validateRequired,
+                enabled: !_isSaving,
               ),
-              const SizedBox(height: 16),
 
-              _buildTextField(
+              DefaultTextField(
                 controller: _jobTitleController,
-                label: 'المنصب',
-                hint: 'أدخل المنصب',
+                label: 'position'.tr(),
+                hint: 'enter_position'.tr(),
                 validator: Validators.validateRequired,
+                enabled: !_isSaving,
               ),
-              const SizedBox(height: 16),
 
-              _buildTextField(
+              DefaultTextField(
                 controller: _companyNameController,
-                label: 'اسم الشركة',
-                hint: 'أدخل اسم الشركة',
+                label: 'company_name'.tr(),
+                hint: 'enter_company_name'.tr(),
                 validator: Validators.validateRequired,
+                enabled: !_isSaving,
               ),
-              const SizedBox(height: 16),
 
-              _buildTextField(
+              DefaultTextField(
                 controller: _phoneController,
-                label: 'رقم الهاتف',
-                hint: 'أدخل رقم الهاتف',
+                label: 'phone_number'.tr(),
+                hint: 'enter_phone_number'.tr(),
                 keyboardType: TextInputType.phone,
                 validator: Validators.validatePhone,
+                enabled: !_isSaving,
               ),
-              const SizedBox(height: 16),
 
-              _buildTextField(
+              DefaultTextField(
                 controller: _emailController,
-                label: 'البريد الإلكتروني',
-                hint: 'أدخل البريد الإلكتروني',
+                label: 'email_address'.tr(),
+                hint: 'enter_email_address'.tr(),
                 keyboardType: TextInputType.emailAddress,
                 validator: Validators.validateEmail,
+                enabled: !_isSaving,
               ),
-              const SizedBox(height: 16),
 
-              _buildTextField(
+              DefaultTextField(
                 controller: _websiteController,
-                label: 'الموقع الإلكتروني',
-                hint: 'أدخل الموقع الإلكتروني',
+                label: 'website'.tr(),
+                hint: 'enter_website'.tr(),
                 keyboardType: TextInputType.url,
+                enabled: !_isSaving,
               ),
-              const SizedBox(height: 16),
 
-              _buildTextField(
+              DefaultTextField(
                 controller: _addressController,
-                label: 'الموقع',
-                hint: 'أدخل الموقع',
+                label: 'location'.tr(),
+                hint: 'enter_location'.tr(),
                 maxLines: 2,
+                enabled: !_isSaving,
               ),
               const SizedBox(height: 24),
 
@@ -228,30 +244,30 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.textSecondary.withOpacity(0.1),
+                      color: AppColors.textSecondary.withValues(alpha: 0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'تخصيص الألوان',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'customize_colors'.tr(),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
-                    ),
                     const SizedBox(height: 16),
                     
                     Row(
                       children: [
                         Expanded(
                           child: _buildColorSelector(
-                            title: 'حدد لون الخلفية',
+                            title: 'select_background_color'.tr(),
                             selectedColor: _backgroundColor,
                             onColorSelected: (color) {
                               setState(() {
@@ -263,7 +279,7 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: _buildColorSelector(
-                            title: 'حدد لون النص',
+                            title: 'select_text_color'.tr(),
                             selectedColor: _textColor,
                             onColorSelected: (color) {
                               setState(() {
@@ -287,13 +303,13 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
                     child: ElevatedButton(
                       onPressed: _isSaving ? null : _saveCard,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.white,
+                        backgroundColor: const Color(0xFF4CAF50),
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        elevation: 4,
+                        elevation: 0,
                       ),
                       child: _isSaving
                           ? const SizedBox(
@@ -304,9 +320,9 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
                                 color: AppColors.white,
                               ),
                             )
-                          : const Text(
-                              'أضف بطاقة جديدة',
-                              style: TextStyle(
+                          : Text(
+                              'add_new_card'.tr(),
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -318,24 +334,25 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
                     child: OutlinedButton(
                       onPressed: _retakePhoto,
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: const BorderSide(color: AppColors.primary),
+                        foregroundColor: const Color(0xFF2196F3),
+                        backgroundColor: Colors.white,
+                        side: const BorderSide(color: Color(0xFF2196F3), width: 1),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(
-                            Icons.qr_code_scanner, // Changed to scan icon
+                            Icons.qr_code_scanner,
                             size: 20,
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'التقط مرة أخرى',
-                            style: TextStyle(
+                          Text(
+                            'capture_again'.tr(),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -354,58 +371,7 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        filled: true,
-        fillColor: AppColors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: AppColors.textSecondary.withOpacity(0.1),
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: AppColors.primary,
-            width: 2,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Colors.red,
-          ),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Colors.red,
-            width: 2,
-          ),
-        ),
-      ),
-      keyboardType: keyboardType,
-      validator: validator,
-      maxLines: maxLines,
-      enabled: !_isSaving,
-    );
-  }
+  // تم استبدال دالة الإدخال الافتراضية بدالة DefaultTextField الموحدة
 
   Widget _buildColorSelector({
     required String title,
@@ -427,10 +393,11 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
         Text(
           title,
           style: const TextStyle(
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: AppColors.textPrimary,
+            color: Colors.black87,
           ),
+          textAlign: TextAlign.right,
         ),
         const SizedBox(height: 8),
         Container(
@@ -439,7 +406,7 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
           decoration: BoxDecoration(
             color: selectedColor,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.textSecondary.withOpacity(0.2)),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
           ),
         ),
         const SizedBox(height: 8),

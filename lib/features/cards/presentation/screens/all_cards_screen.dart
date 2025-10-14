@@ -4,7 +4,6 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/animated_page_route.dart';
 import '../../../../core/utils/custom_snackbar.dart';
-import '../../../../core/widgets/animated_card.dart';
 import '../../../../core/widgets/empty_state_widget.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
@@ -83,6 +82,31 @@ class _AllCardsScreenState extends State<AllCardsScreen>
       ScalePageRoute(
         page: CardDetailScreen(card: card),
       ),
+    );
+  }
+
+  void _deleteCard(dynamic card) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('delete_card'.tr()),
+          content: Text('confirm_delete_card'.tr()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('cancel'.tr()),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.read<CardsBloc>().add(DeleteCard(card.id));
+              },
+              child: Text('delete'.tr()),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -206,93 +230,260 @@ class _AllCardsScreenState extends State<AllCardsScreen>
                       itemCount: state.cards.length,
                       itemBuilder: (context, index) {
                         final card = state.cards[index];
-                        return AnimatedCard(
-                          index: index,
-                          onTap: () => _navigateToCardDetail(card),
-                          child: Row(
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          child: Column(
                             children: [
-                              // Avatar
+                              // Main Card - exactly like the image
                               Container(
-                                width: 70,
-                                height: 70,
+                                width: double.infinity,
+                                height: 200,
                                 decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppColors.primary,
-                                      AppColors.primary.withValues(alpha: 0.8),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(18),
+                                  color: const Color(0xFFFFF8E1), // Light yellow background like in image
+                                  borderRadius: BorderRadius.circular(12),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.primary.withValues(alpha: 0.2),
+                                      color: Colors.black.withValues(alpha: 0.1),
                                       blurRadius: 8,
                                       offset: const Offset(0, 4),
                                     ),
                                   ],
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    card.fullName.isNotEmpty
-                                        ? card.fullName[0].toUpperCase()
-                                        : '?',
-                                    style: const TextStyle(
-                                      color: AppColors.white,
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Row(
+                                    children: [
+                                      // Left Side (Arabic content)
+                                      Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            // Arabic name - orange color like in image
+                                            Text(
+                                              card.fullName,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFFFF8A65), // Light orange like in image
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            // Arabic job title - lighter yellow like in image
+                                            Text(
+                                              card.jobTitle,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Color(0xFFFFCC80), // Lighter yellow like in image
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            // Vertical icons - small yellow squares like in image
+                                            Column(
+                                              children: List.generate(5, (index) => Container(
+                                                margin: const EdgeInsets.only(bottom: 4),
+                                                width: 12,
+                                                height: 12,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFFFFCC80), // Light yellow like in image
+                                                  borderRadius: BorderRadius.circular(2),
+                                                ),
+                                              )),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      
+                                      // Right Side (English content - no dark background, white text on yellow)
+                                      Expanded(
+                                        flex: 1,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            // Company name with icon
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                const Icon(
+                                                  Icons.business,
+                                                  size: 16,
+                                                  color: Colors.white,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  card.companyName,
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 8),
+                                            
+                                            // Location
+                                            if (card.address?.isNotEmpty == true)
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  const Icon(
+                                                    Icons.location_on,
+                                                    size: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    card.address!,
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            const SizedBox(height: 4),
+                                            
+                                            // Email
+                                            if (card.email.isNotEmpty)
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  const Icon(
+                                                    Icons.email,
+                                                    size: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    card.email,
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            const SizedBox(height: 4),
+                                            
+                                            // Phone
+                                            if (card.phone.isNotEmpty)
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  const Icon(
+                                                    Icons.phone,
+                                                    size: 16,
+                                                    color: Colors.white,
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    card.phone,
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            const Spacer(),
+                                            
+                                            // Website icon
+                                            if (card.website?.isNotEmpty == true)
+                                              const Icon(
+                                                Icons.language,
+                                                size: 16,
+                                                color: Colors.white,
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 16),
-
-                              // Card Info
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      card.fullName,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                              
+                              // Action buttons below the card - exactly like in the image
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Edit button with text - green filled circle
+                                  GestureDetector(
+                                    onTap: () => _navigateToCardDetail(card),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          width: 44,
+                                          height: 44,
+                                          decoration: BoxDecoration(
+                                            color: Colors.green,
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(alpha: 0.15),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: const Icon(
+                                            Icons.edit,
+                                            size: 22,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          'Edit',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      card.jobTitle,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: AppColors.primary,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(width: 32),
+                                  // Delete button with text - red filled circle
+                                  GestureDetector(
+                                    onTap: () => _deleteCard(card),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          width: 44,
+                                          height: 44,
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(alpha: 0.15),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: const Icon(
+                                            Icons.delete,
+                                            size: 22,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          'Delete',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      card.companyName,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: AppColors.textSecondary,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Arrow Icon
-                              Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
-                                color: AppColors.textSecondary,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
