@@ -1,6 +1,9 @@
+import 'package:bcode/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:bcode/features/auth/presentation/bloc/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../shared_widgets/default_text_field.dart';
@@ -9,28 +12,20 @@ import '../../../../core/utils/custom_snackbar.dart';
 import '../../data/model/business_card_model.dart';
 import '../bloc/cards_bloc.dart';
 import '../bloc/cards_event.dart';
-import 'add_card_screen.dart';
 
-class AddCardFormScreen extends StatefulWidget {
-  final String userId;
-  final String? imagePath;
+class CardFormScreen extends StatefulWidget {
   final BusinessCardModel? existingCard;
 
-  const AddCardFormScreen({
-    super.key,
-    required this.userId,
-    this.imagePath,
-    this.existingCard,
-  });
+  const CardFormScreen({super.key, this.existingCard});
 
   @override
-  State<AddCardFormScreen> createState() => _AddCardFormScreenState();
+  State<CardFormScreen> createState() => _CardFormScreenState();
 }
 
-class _AddCardFormScreenState extends State<AddCardFormScreen> {
+class _CardFormScreenState extends State<CardFormScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
-  
+
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _jobTitleController = TextEditingController();
@@ -40,17 +35,25 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
   final _websiteController = TextEditingController();
   final _addressController = TextEditingController();
 
-  Color _backgroundColor = const Color(0xFF4CAF50);
-  Color _textColor = const Color(0xFFE91E63);
+  Color backgroundPickerColor = AppColors.primary;
+  Color currentBackgroundColor = AppColors.primary;
+
+  Color textPickerColor = Colors.white;
+  Color currentTextColor = Colors.white;
 
   @override
   void initState() {
     super.initState();
-    
+
     // Initialize form with existing card data if editing
     if (widget.existingCard != null) {
-      _firstNameController.text = widget.existingCard!.fullName.split(' ').first;
-      _lastNameController.text = widget.existingCard!.fullName.split(' ').skip(1).join(' ');
+      _firstNameController.text = widget.existingCard!.fullName
+          .split(' ')
+          .first;
+      _lastNameController.text = widget.existingCard!.fullName
+          .split(' ')
+          .skip(1)
+          .join(' ');
       _jobTitleController.text = widget.existingCard!.jobTitle;
       _companyNameController.text = widget.existingCard!.companyName;
       _phoneController.text = widget.existingCard!.phone;
@@ -73,19 +76,11 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
     super.dispose();
   }
 
-  Future<void> _retakePhoto() async {
-    // Navigate back to camera/scan screen
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddCardScreen(
-          userId: widget.userId,
-        ),
-      ),
-    );
-  }
-
   Future<void> _saveCard() async {
+    final authState = context.read<AuthBloc>().state;
+    String userId = authState is Authenticated
+        ? authState.user.id
+        : 'guest_user';
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -95,11 +90,13 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final fullName = '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}'.trim();
-      
+      final fullName =
+          '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}'
+              .trim();
+
       final card = BusinessCardModel(
         id: widget.existingCard?.id ?? const Uuid().v4(),
-        userId: widget.userId,
+        userId: userId,
         fullName: fullName,
         companyName: _companyNameController.text.trim(),
         jobTitle: _jobTitleController.text.trim(),
@@ -111,8 +108,10 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
         address: _addressController.text.trim().isEmpty
             ? null
             : _addressController.text.trim(),
-        imagePath: widget.imagePath,
+        //   textColor: widget.imagePath,
         createdAt: widget.existingCard?.createdAt ?? DateTime.now(),
+        textColor: currentTextColor,
+        cardColor: currentBackgroundColor,
       );
 
       if (widget.existingCard == null) {
@@ -250,50 +249,31 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
                     ),
                   ],
                 ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'customize_colors'.tr(),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildColorSelector(
+                        title: 'select_background_color'.tr(),
+                        selectedColor: currentBackgroundColor,
+                        onColorSelected: () {
+                          showColorPicker(true);
+                        },
                       ),
-                    const SizedBox(height: 16),
-                    
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildColorSelector(
-                            title: 'select_background_color'.tr(),
-                            selectedColor: _backgroundColor,
-                            onColorSelected: (color) {
-                              setState(() {
-                                _backgroundColor = color;
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: _buildColorSelector(
-                            title: 'select_text_color'.tr(),
-                            selectedColor: _textColor,
-                            onColorSelected: (color) {
-                              setState(() {
-                                _textColor = color;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildColorSelector(
+                        title: 'select_text_color'.tr(),
+                        selectedColor: currentTextColor,
+                        onColorSelected: () {
+                          showColorPicker(false);
+                        },
+                      ),
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 32),
 
               // Action Buttons
@@ -330,37 +310,6 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: _retakePhoto,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF2196F3),
-                        backgroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFF2196F3), width: 1),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.qr_code_scanner,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'capture_again'.tr(),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -371,65 +320,94 @@ class _AddCardFormScreenState extends State<AddCardFormScreen> {
     );
   }
 
-  // تم استبدال دالة الإدخال الافتراضية بدالة DefaultTextField الموحدة
-
   Widget _buildColorSelector({
     required String title,
     required Color selectedColor,
-    required Function(Color) onColorSelected,
+    required Function() onColorSelected,
   }) {
-    final colors = [
-      const Color(0xFF4CAF50),
-      const Color(0xFF2196F3),
-      const Color(0xFFE91E63),
-      const Color(0xFFFF9800),
-      const Color(0xFF9C27B0),
-      const Color(0xFF607D8B),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
-          textAlign: TextAlign.right,
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 40,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: selectedColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: colors.map((color) {
-            return GestureDetector(
-              onTap: () => onColorSelected(color),
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(6),
-                  border: selectedColor == color
-                      ? Border.all(color: AppColors.primary, width: 2)
-                      : null,
-                ),
+    return InkWell(
+      onTap: () => onColorSelected(),
+      child: SizedBox(
+        height: 80,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
               ),
-            );
-          }).toList(),
+              textAlign: TextAlign.right,
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 30,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: selectedColor,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
         ),
-      ],
+      ),
     );
   }
+
+  void changeColor(Color currentColor, bool isBackground) {
+    if (isBackground) {
+      setState(() => backgroundPickerColor = currentColor);
+    } else {
+      setState(() => textPickerColor = currentColor);
+    }
+  }
+
+  showColorPicker(bool isBackground) => showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Pick a color!'),
+      content: SingleChildScrollView(
+        child: ColorPicker(
+          pickerColor: isBackground ? backgroundPickerColor : textPickerColor,
+          onColorChanged: (newColor) => changeColor(newColor, isBackground),
+        ),
+        // Use Material color picker:
+        //
+        // child: MaterialPicker(
+        //   pickerColor: pickerColor,
+        //   onColorChanged: changeColor,
+        //   showLabel: true, // only on portrait mode
+        // ),
+        //
+        // Use Block color picker:
+        //
+        // child: BlockPicker(
+        //   pickerColor: currentColor,
+        //   onColorChanged: changeColor,
+        // ),
+        //
+        // child: MultipleChoiceBlockPicker(
+        //   pickerColors: currentColors,
+        //   onColorsChanged: changeColors,
+        // ),
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+          child: const Text('Got it'),
+          onPressed: () {
+            if (isBackground) {
+              setState(() => currentBackgroundColor = backgroundPickerColor);
+            } else {
+              setState(() => currentTextColor = textPickerColor);
+            }
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    ),
+  );
 }

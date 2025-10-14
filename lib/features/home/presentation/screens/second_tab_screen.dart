@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/utils/app_colors.dart';
-import '../../../../core/utils/image_storage.dart';
 import '../../../../core/utils/custom_snackbar.dart';
-import '../../../auth/presentation/bloc/auth_bloc.dart';
-import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../cards/presentation/screens/add_card_form_screen.dart';
 import '../../../cards/presentation/screens/all_cards_screen.dart';
 
@@ -26,23 +22,11 @@ class _SecondTabScreenState extends State<SecondTabScreen> {
       );
 
       if (image != null) {
-        // Save image to permanent storage
-        final String permanentPath = await ImageStorage.saveImage(image.path);
-        
-        // Get user ID
-        final authState = context.read<AuthBloc>().state;
-        String userId = authState is Authenticated ? authState.user.id : 'guest_user';
-        
         // Navigate to add card form screen with the selected image
         if (mounted) {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => AddCardFormScreen(
-                userId: userId,
-                imagePath: permanentPath,
-              ),
-            ),
+            MaterialPageRoute(builder: (context) => CardFormScreen()),
           );
         }
       }
@@ -102,5 +86,4 @@ class _SecondTabScreenState extends State<SecondTabScreen> {
       ),
     );
   }
-  
 }

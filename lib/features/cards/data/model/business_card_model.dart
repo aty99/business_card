@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:hive/hive.dart';
 
 part 'business_card_model.g.dart';
@@ -34,10 +36,13 @@ class BusinessCardModel extends HiveObject {
   final String? address;
 
   @HiveField(9)
-  final String? imagePath; // Path to scanned card image
+  final Color textColor;
 
   @HiveField(10)
   final DateTime createdAt;
+
+  @HiveField(11)
+  final Color cardColor;
 
   BusinessCardModel({
     required this.id,
@@ -47,9 +52,11 @@ class BusinessCardModel extends HiveObject {
     required this.jobTitle,
     required this.email,
     required this.phone,
+    required this.cardColor,
+    required this.textColor,
     this.website,
     this.address,
-    this.imagePath,
+
     required this.createdAt,
   });
 
@@ -63,8 +70,9 @@ class BusinessCardModel extends HiveObject {
     String? phone,
     String? website,
     String? address,
-    String? imagePath,
+    Color? textColor,
     DateTime? createdAt,
+    Color? cardColor,
   }) {
     return BusinessCardModel(
       id: id ?? this.id,
@@ -76,8 +84,9 @@ class BusinessCardModel extends HiveObject {
       phone: phone ?? this.phone,
       website: website ?? this.website,
       address: address ?? this.address,
-      imagePath: imagePath ?? this.imagePath,
+      textColor: textColor ?? this.textColor,
       createdAt: createdAt ?? this.createdAt,
+      cardColor: cardColor ?? this.cardColor,
     );
   }
 
@@ -92,8 +101,9 @@ class BusinessCardModel extends HiveObject {
       'phone': phone,
       'website': website,
       'address': address,
-      'imagePath': imagePath,
+      'textColor': textColor,
       'createdAt': createdAt.toIso8601String(),
+      'cardColor': cardColor,
     };
   }
 
@@ -108,8 +118,9 @@ class BusinessCardModel extends HiveObject {
       phone: json['phone'] as String,
       website: json['website'] as String?,
       address: json['address'] as String?,
-      imagePath: json['imagePath'] as String?,
+      textColor: json['textColor'],
       createdAt: DateTime.parse(json['createdAt'] as String),
+      cardColor: json['cardColor'],
     );
   }
 
@@ -118,4 +129,3 @@ class BusinessCardModel extends HiveObject {
     return 'BusinessCardModel(id: $id, fullName: $fullName, companyName: $companyName, jobTitle: $jobTitle)';
   }
 }
-

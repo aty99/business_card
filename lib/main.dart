@@ -1,3 +1,4 @@
+import 'package:bcode/features/cards/data/model/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -20,6 +21,7 @@ void main() async {
   // Register Hive adapters
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(BusinessCardModelAdapter());
+  Hive.registerAdapter(ColorAdapter());
 
   // Initialize services via Injector
   await Injector().hiveDBService.init();
@@ -48,56 +50,54 @@ class MyApp extends StatelessWidget {
           create: (context) =>
               Injector().authBloc..add(const CheckAuthStatus()),
         ),
-        BlocProvider(
-          create: (context) => Injector().cardsBloc,
-        ),
+        BlocProvider(create: (context) => Injector().cardsBloc),
       ],
-        child: Builder(
-          builder: (context) {
-            return MaterialApp(
-              title: 'Business Card Manager',
-              debugShowCheckedModeBanner: false,
-              localizationsDelegates: context.localizationDelegates,
-              supportedLocales: context.supportedLocales,
-              locale: context.locale,
-              theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-                useMaterial3: true,
-                primaryColor: AppColors.primary,
-                scaffoldBackgroundColor: AppColors.background,
-                appBarTheme: const AppBarTheme(
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            title: 'Business Card Manager',
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+              useMaterial3: true,
+              primaryColor: AppColors.primary,
+              scaffoldBackgroundColor: AppColors.background,
+              appBarTheme: const AppBarTheme(
+                backgroundColor: AppColors.primary,
+                foregroundColor: AppColors.white,
+                elevation: 0,
+              ),
+              cardTheme: CardThemeData(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              inputDecorationTheme: InputDecorationTheme(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: AppColors.background,
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.white,
-                  elevation: 0,
-                ),
-                cardTheme: CardThemeData(
-                  elevation: 2,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                inputDecorationTheme: InputDecorationTheme(
-                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: AppColors.background,
-                ),
-                elevatedButtonTheme: ElevatedButtonThemeData(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
                   ),
                 ),
               ),
-              home: const InitPage(),
-            );
-          },
-        ),
+            ),
+            home: const InitPage(),
+          );
+        },
+      ),
     );
   }
 }

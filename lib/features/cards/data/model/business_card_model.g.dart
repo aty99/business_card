@@ -26,8 +26,9 @@ class BusinessCardModelAdapter extends TypeAdapter<BusinessCardModel> {
       phone: fields[6] as String,
       website: fields[7] as String?,
       address: fields[8] as String?,
-      imagePath: fields[9] as String?,
+      textColor: fields[9] as Color,
       createdAt: fields[10] as DateTime,
+      cardColor: fields[11] as Color,
     );
   }
 
@@ -54,8 +55,10 @@ class BusinessCardModelAdapter extends TypeAdapter<BusinessCardModel> {
       ..writeByte(8)
       ..write(obj.address)
       ..writeByte(9)
-      ..write(obj.imagePath)
+      ..write(obj.textColor)
       ..writeByte(10)
+      ..writeByte(11)
+      ..write(obj.cardColor)
       ..write(obj.createdAt);
   }
 
