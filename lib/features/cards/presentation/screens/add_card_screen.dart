@@ -10,6 +10,7 @@ import '../../../../core/utils/custom_snackbar.dart';
 import '../../data/model/business_card_model.dart';
 import '../bloc/cards_bloc.dart';
 import '../bloc/cards_event.dart';
+import 'add_card_form_screen.dart';
 
 /// Screen for adding or editing a business card
 class AddCardScreen extends StatefulWidget {
@@ -113,7 +114,9 @@ class _AddCardScreenState extends State<AddCardScreen>
         });
         
         if (mounted) {
-          context.showSuccessSnackBar('Image captured successfully!');
+          context.showSuccessSnackBar('تم التقاط الصورة بنجاح!');
+          // Navigate to form screen after capturing image
+          _navigateToFormScreen();
         }
       }
     } catch (e) {
@@ -125,6 +128,19 @@ class _AddCardScreenState extends State<AddCardScreen>
         setState(() => _isScanning = false);
       }
     }
+  }
+
+  void _navigateToFormScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddCardFormScreen(
+          userId: widget.userId,
+          imagePath: _imagePath,
+          existingCard: widget.card,
+        ),
+      ),
+    );
   }
 
   void _removeImage() {
@@ -268,6 +284,31 @@ class _AddCardScreenState extends State<AddCardScreen>
                 ),
                 const SizedBox(height: 32),
 
+                // Action Buttons
+                if (_imagePath != null && _imagePath!.isNotEmpty) ...[
+                  // Navigate to Form Button
+                  ElevatedButton(
+                    onPressed: _navigateToFormScreen,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 4,
+                    ),
+                    child: const Text(
+                      'انتقل لحقول النص',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                
                 // Save Button
                 ElevatedButton(
                   onPressed: _isSaving ? null : _saveCard,
@@ -290,7 +331,7 @@ class _AddCardScreenState extends State<AddCardScreen>
                           ),
                         )
                       : Text(
-                          isEditing ? 'Update Card' : 'Save Card',
+                          isEditing ? 'تحديث البطاقة' : 'حفظ البطاقة',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

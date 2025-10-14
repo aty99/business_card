@@ -11,7 +11,8 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/screens/sign_in_screen.dart';
 import '../../../cards/presentation/screens/all_cards_screen.dart';
-import '../../../cards/presentation/screens/add_card_screen.dart';
+import '../../../cards/presentation/screens/add_card_form_screen.dart';
+import 'second_tab_screen.dart';
 import 'widgets/drawer_item.dart';
 import 'widgets/logout.dart';
 
@@ -23,12 +24,20 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  int _selectedTabIndex = 0; // 0 for cards, 1 for second tab
   
+  void _navigateToSecondTab() {
+    // Just change the selected tab, no navigation
+    setState(() {
+      _selectedTabIndex = 1;
+    });
+  }
+
   Future<void> _openCameraAndNavigate() async {
     try {
       final picker = ImagePicker();
       final image = await picker.pickImage(
-        source: ImageSource.camera,
+        source: ImageSource.gallery, // Changed to gallery
         imageQuality: 85,
       );
 
@@ -40,14 +49,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         final authState = context.read<AuthBloc>().state;
         String userId = authState is Authenticated ? authState.user.id : 'guest_user';
         
-        // Navigate to add card screen with the captured image
+        // Navigate to add card form screen with the selected image
         if (mounted) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddCardScreen(
+              builder: (context) => AddCardFormScreen(
                 userId: userId,
-                initialImagePath: permanentPath,
+                imagePath: permanentPath,
               ),
             ),
           );
@@ -55,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
     } catch (e) {
       if (mounted) {
-        context.showErrorSnackBar('Failed to capture image: $e');
+        context.showErrorSnackBar('فشل في اختيار الصورة: $e');
       }
     }
   }
@@ -161,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
       ),
-      body: AllCardsScreen(),
+      body: _selectedTabIndex == 0 ? AllCardsScreen() : const SecondTabScreen(),
       bottomNavigationBar: Container(
         height: 80,
         decoration: BoxDecoration(
@@ -176,32 +185,52 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // Left card icon
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.credit_card,
-                color: Colors.white,
-                size: 20,
+            // Left tab icon (Scan tab)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedTabIndex = 0;
+                });
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: _selectedTabIndex == 0 
+                      ? const Color(0xFF4CAF50) 
+                      : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.qr_code_scanner,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
-            // Right card icon
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.credit_card,
-                color: Colors.white,
-                size: 20,
+            // Right tab icon (Profile tab)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedTabIndex = 1;
+                });
+                // Navigate to profile page
+                _navigateToSecondTab();
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: _selectedTabIndex == 1 
+                      ? const Color(0xFF4CAF50) 
+                      : Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
           ],
@@ -210,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       floatingActionButton: Container(
         margin: const EdgeInsets.only(right: 16, bottom: 16),
         child: FloatingActionButton(
-          onPressed: _openCameraAndNavigate,
+          onPressed: _selectedTabIndex == 0 ? _openCameraAndNavigate : null,
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: Container(
@@ -235,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
             child: const Icon(
-              Icons.qr_code_scanner,
+              Icons.camera_alt,
               color: Colors.white,
               size: 28,
             ),
