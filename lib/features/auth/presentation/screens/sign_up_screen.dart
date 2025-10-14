@@ -12,7 +12,7 @@ import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 import 'sign_in_screen.dart';
 
-/// Sign Up screen for new user registration
+/// Screen for user sign up
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -20,6 +20,7 @@ class SignUpScreen extends StatefulWidget {
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
+/// State for SignUpScreen
 class _SignUpScreenState extends State<SignUpScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
@@ -56,6 +57,7 @@ class _SignUpScreenState extends State<SignUpScreen>
   }
 
   @override
+  /// Build sign up screen UI
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,

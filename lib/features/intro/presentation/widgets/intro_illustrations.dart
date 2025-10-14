@@ -42,12 +42,12 @@ class IntroIllustrations {
               width: 100,
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: AppColors.textSecondary.withOpacity(0.3), width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: AppColors.black.withOpacity(0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -87,11 +87,7 @@ class IntroIllustrations {
                       width: 20,
                       height: 12,
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [AppColors.introTeal, AppColors.introBlue],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        gradient: AppColors.introButtonGradientBlue,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Stack(
@@ -104,7 +100,7 @@ class IntroIllustrations {
                                 width: 3,
                                 height: 8,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: AppColors.white.withOpacity(0.7),
                                   borderRadius: BorderRadius.circular(1),
                                 ),
                               ),
@@ -160,7 +156,7 @@ class IntroIllustrations {
               width: 80,
               height: 140,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.textSecondary, width: 2),
               ),
@@ -187,7 +183,7 @@ class IntroIllustrations {
                       width: 50,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: AppColors.textSecondary, width: 1),
                       ),
@@ -343,7 +339,7 @@ class IntroIllustrations {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.textSecondary, width: 2),
-                color: Colors.white,
+                color: AppColors.white,
               ),
               child: Center(
                 child: SizedBox(
@@ -516,7 +512,7 @@ class _FlowerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.pink.shade300
+      ..color = AppColors.pink
       ..style = PaintingStyle.fill;
 
     // Stem
@@ -535,11 +531,7 @@ class _ChainLinkPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..shader = const LinearGradient(
-        colors: [AppColors.introGreen, AppColors.introBlue],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..shader = AppColors.introGradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
     // First chain link

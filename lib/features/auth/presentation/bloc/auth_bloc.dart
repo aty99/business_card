@@ -3,6 +3,7 @@ import '../../data/repository/auth_repository.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
+/// Bloc for managing authentication events and state
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepository;
 
@@ -13,6 +14,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignOutRequested>(_onSignOutRequested);
   }
 
+  /// Handle checking authentication status
   Future<void> _onCheckAuthStatus(
     CheckAuthStatus event,
     Emitter<AuthState> emit,
@@ -29,6 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  /// Handle user sign up
   Future<void> _onSignUpRequested(
     SignUpRequested event,
     Emitter<AuthState> emit,
@@ -48,6 +51,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  /// Handle user sign in
   Future<void> _onSignInRequested(
     SignInRequested event,
     Emitter<AuthState> emit,
@@ -65,6 +69,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  /// Handle user sign out
   Future<void> _onSignOutRequested(
     SignOutRequested event,
     Emitter<AuthState> emit,

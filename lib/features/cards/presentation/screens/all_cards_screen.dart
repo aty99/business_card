@@ -13,7 +13,8 @@ import '../bloc/cards_event.dart';
 import '../bloc/cards_state.dart';
 
 class AllCardsScreen extends StatefulWidget {
-  const AllCardsScreen({super.key});
+  final int tabId;
+  const AllCardsScreen(this.tabId, {super.key});
 
   @override
   State<AllCardsScreen> createState() => _AllCardsScreenState();
@@ -38,17 +39,17 @@ class _AllCardsScreenState extends State<AllCardsScreen>
     super.dispose();
   }
 
+  /// Load cards for current user
   void _loadCards() {
     final authState = context.read<AuthBloc>().state;
     String userId = authState is Authenticated
         ? authState.user.id
         : 'guest_user';
-    context.read<CardsBloc>().add(LoadCards(userId));
+    context.read<CardsBloc>().add(LoadCards(userId, widget.tabId));
   }
 
-
-
   @override
+  /// Build all cards screen UI
   Widget build(BuildContext context) {
     return Container(
       color: AppColors.background,
@@ -57,7 +58,7 @@ class _AllCardsScreenState extends State<AllCardsScreen>
           if (state is CardsError) {
             context.showErrorSnackBar(state.message);
           } else if (state is CardAdded) {
-            context.showSuccessSnackBar('card_added_successfully'.tr());
+            context.showSuccessSnackBar('card_saved_successfully'.tr());
             _loadCards();
           } else if (state is CardUpdated) {
             context.showSuccessSnackBar('card_updated_successfully'.tr());
@@ -89,10 +90,10 @@ class _AllCardsScreenState extends State<AllCardsScreen>
                 itemCount: state.cards.length,
                 itemBuilder: (context, index) {
                   final card = state.cards[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: CardItem(card),
-                    );
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    child: CardItem(card),
+                  );
                 },
               ),
             );

@@ -1,69 +1,62 @@
 import 'dart:ui';
-
 import 'package:hive/hive.dart';
-
 part 'business_card_model.g.dart';
 
-/// Business card model
-/// Stores business card information including company details and contact info
+/// Model for business card data
 @HiveType(typeId: 1)
 class BusinessCardModel extends HiveObject {
   @HiveField(0)
-  final String id;
-
+  final String? id;
   @HiveField(1)
-  final String userId; // Owner of the card
-
+  final String? userId;
   @HiveField(2)
-  final String fullName;
-
+  final String? firstName;
   @HiveField(3)
-  final String companyName;
-
+  final String? companyName;
   @HiveField(4)
-  final String jobTitle;
-
+  final String? jobTitle;
   @HiveField(5)
-  final String email;
-
+  final String? email;
   @HiveField(6)
-  final String phone;
-
+  final String? phone;
   @HiveField(7)
   final String? website;
-
   @HiveField(8)
   final String? address;
-
   @HiveField(9)
-  final Color textColor;
-
+  final Color? textColor;
   @HiveField(10)
-  final DateTime createdAt;
-
+  final DateTime? createdAt;
   @HiveField(11)
-  final Color cardColor;
+  final Color? cardColor;
+  @HiveField(12)
+  final int? tabId;
+  @HiveField(13)
+  final String? secName;
 
+  /// Constructor for business card model
   BusinessCardModel({
-    required this.id,
-    required this.userId,
-    required this.fullName,
-    required this.companyName,
-    required this.jobTitle,
-    required this.email,
-    required this.phone,
-    required this.cardColor,
-    required this.textColor,
+    this.id,
+    this.userId,
+    this.firstName,
+    this.companyName,
+    this.jobTitle,
+    this.email,
+    this.phone,
+    this.cardColor,
+    this.textColor,
     this.website,
     this.address,
-
-    required this.createdAt,
+    this.createdAt,
+    this.tabId,
+    this.secName,
   });
 
+  /// Create a copy of the business card with updated fields
   BusinessCardModel copyWith({
     String? id,
     String? userId,
-    String? fullName,
+    String? firstName,
     String? companyName,
     String? jobTitle,
     String? email,
@@ -73,11 +66,13 @@ class BusinessCardModel extends HiveObject {
     Color? textColor,
     DateTime? createdAt,
     Color? cardColor,
+    int? tabId,
+    String? secName,
   }) {
     return BusinessCardModel(
       id: id ?? this.id,
       userId: userId ?? this.userId,
-      fullName: fullName ?? this.fullName,
+      firstName: firstName ?? this.firstName,
       companyName: companyName ?? this.companyName,
       jobTitle: jobTitle ?? this.jobTitle,
       email: email ?? this.email,
@@ -87,6 +82,8 @@ class BusinessCardModel extends HiveObject {
       textColor: textColor ?? this.textColor,
       createdAt: createdAt ?? this.createdAt,
       cardColor: cardColor ?? this.cardColor,
+      tabId: tabId ?? this.tabId,
+      secName: secName ?? this.secName,
     );
   }
 
@@ -94,7 +91,7 @@ class BusinessCardModel extends HiveObject {
     return {
       'id': id,
       'userId': userId,
-      'fullName': fullName,
+      'firstName': firstName,
       'companyName': companyName,
       'jobTitle': jobTitle,
       'email': email,
@@ -102,30 +99,34 @@ class BusinessCardModel extends HiveObject {
       'website': website,
       'address': address,
       'textColor': textColor,
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String(),
       'cardColor': cardColor,
+      'tabId': tabId,
+      'secName': secName,
     };
   }
 
   factory BusinessCardModel.fromJson(Map<String, dynamic> json) {
     return BusinessCardModel(
-      id: json['id'] as String,
-      userId: json['userId'] as String,
-      fullName: json['fullName'] as String,
-      companyName: json['companyName'] as String,
-      jobTitle: json['jobTitle'] as String,
-      email: json['email'] as String,
-      phone: json['phone'] as String,
-      website: json['website'] as String?,
-      address: json['address'] as String?,
+      id: json['id'],
+      userId: json['userId'],
+      firstName: json['firstName'],
+      companyName: json['companyName'],
+      jobTitle: json['jobTitle'],
+      email: json['email'],
+      phone: json['phone'],
+      website: json['website'],
+      address: json['address'],
       textColor: json['textColor'],
       createdAt: DateTime.parse(json['createdAt'] as String),
       cardColor: json['cardColor'],
+      tabId: json['tabId'],
+      secName: json['secName'],
     );
   }
 
   @override
   String toString() {
-    return 'BusinessCardModel(id: $id, fullName: $fullName, companyName: $companyName, jobTitle: $jobTitle)';
+    return 'BusinessCardModel(id: $id, firstName: $firstName, companyName: $companyName, jobTitle: $jobTitle, email: $email, phone: $phone, website: $website, address: $address, textColor: $textColor, createdAt: $createdAt, cardColor: $cardColor, tabId: $tabId, secName: $secName)';
   }
 }

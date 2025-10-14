@@ -22,7 +22,8 @@ abstract class HiveDBService {
   Future<BusinessCardModel?> getCardById(String cardId);
   Future<BusinessCardModel> updateCard(BusinessCardModel card);
   Future<void> deleteCard(String cardId);
-  Future<List<BusinessCardModel>> getAllCards();
+  Future<List<BusinessCardModel>> getCapturedCards(String userId);
+  Future<List<BusinessCardModel>> getScannedCards(String userId);
 }
 
 class HiveDBServiceImp implements HiveDBService {
@@ -148,10 +149,19 @@ class HiveDBServiceImp implements HiveDBService {
     await cardsBox.delete(cardId);
   }
 
-  /// Get all cards (for debugging)
-  Future<List<BusinessCardModel>> getAllCards() async {
-    final cardsBox = await _cardBox;
+  @override
+  Future<List<BusinessCardModel>> getScannedCards(String userId) async {
+    final box = await _cardBox;
+    return box.values
+        .where((card) => card.userId == userId && card.tabId == 0)
+        .toList();
+  }
 
-    return cardsBox.values.toList();
+  @override
+  Future<List<BusinessCardModel>> getCapturedCards(String userId) async {
+    final box = await _cardBox;
+    return box.values
+        .where((card) => card.userId == userId && card.tabId == 1)
+        .toList();
   }
 }

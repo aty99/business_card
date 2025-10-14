@@ -17,31 +17,33 @@ class BusinessCardModelAdapter extends TypeAdapter<BusinessCardModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return BusinessCardModel(
-      id: fields[0] as String,
-      userId: fields[1] as String,
-      fullName: fields[2] as String,
-      companyName: fields[3] as String,
-      jobTitle: fields[4] as String,
-      email: fields[5] as String,
-      phone: fields[6] as String,
+      id: fields[0] as String?,
+      userId: fields[1] as String?,
+      firstName: fields[2] as String?,
+      companyName: fields[3] as String?,
+      jobTitle: fields[4] as String?,
+      email: fields[5] as String?,
+      phone: fields[6] as String?,
+      cardColor: fields[11] as Color?,
+      textColor: fields[9] as Color?,
       website: fields[7] as String?,
       address: fields[8] as String?,
-      textColor: fields[9] as Color,
-      createdAt: fields[10] as DateTime,
-      cardColor: fields[11] as Color,
+      createdAt: fields[10] as DateTime?,
+      tabId: fields[12] as int?,
+      secName: fields[13] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, BusinessCardModel obj) {
     writer
-      ..writeByte(11)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.userId)
       ..writeByte(2)
-      ..write(obj.fullName)
+      ..write(obj.firstName)
       ..writeByte(3)
       ..write(obj.companyName)
       ..writeByte(4)
@@ -57,9 +59,13 @@ class BusinessCardModelAdapter extends TypeAdapter<BusinessCardModel> {
       ..writeByte(9)
       ..write(obj.textColor)
       ..writeByte(10)
+      ..write(obj.createdAt)
       ..writeByte(11)
       ..write(obj.cardColor)
-      ..write(obj.createdAt);
+      ..writeByte(12)
+      ..write(obj.tabId)
+      ..writeByte(13)
+      ..write(obj.secName);
   }
 
   @override

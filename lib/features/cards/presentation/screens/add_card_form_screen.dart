@@ -13,15 +13,18 @@ import '../../data/model/business_card_model.dart';
 import '../bloc/cards_bloc.dart';
 import '../bloc/cards_event.dart';
 
+/// Screen for adding or editing a business card
 class CardFormScreen extends StatefulWidget {
   final BusinessCardModel? existingCard;
+  final bool isEdit;
 
-  const CardFormScreen({super.key, this.existingCard});
+  const CardFormScreen({super.key, this.existingCard, this.isEdit = false});
 
   @override
   State<CardFormScreen> createState() => _CardFormScreenState();
 }
 
+/// State for CardFormScreen
 class _CardFormScreenState extends State<CardFormScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isSaving = false;
@@ -38,8 +41,8 @@ class _CardFormScreenState extends State<CardFormScreen> {
   Color backgroundPickerColor = AppColors.primary;
   Color currentBackgroundColor = AppColors.primary;
 
-  Color textPickerColor = Colors.white;
-  Color currentTextColor = Colors.white;
+  Color textPickerColor = AppColors.white;
+  Color currentTextColor = AppColors.white;
 
   @override
   void initState() {
@@ -47,17 +50,12 @@ class _CardFormScreenState extends State<CardFormScreen> {
 
     // Initialize form with existing card data if editing
     if (widget.existingCard != null) {
-      _firstNameController.text = widget.existingCard!.fullName
-          .split(' ')
-          .first;
-      _lastNameController.text = widget.existingCard!.fullName
-          .split(' ')
-          .skip(1)
-          .join(' ');
-      _jobTitleController.text = widget.existingCard!.jobTitle;
-      _companyNameController.text = widget.existingCard!.companyName;
-      _phoneController.text = widget.existingCard!.phone;
-      _emailController.text = widget.existingCard!.email;
+      _firstNameController.text = widget.existingCard!.firstName ?? '';
+      _lastNameController.text = widget.existingCard!.secName ?? '';
+      _jobTitleController.text = widget.existingCard!.jobTitle ?? '';
+      _companyNameController.text = widget.existingCard!.companyName ?? '';
+      _phoneController.text = widget.existingCard!.phone ?? '';
+      _emailController.text = widget.existingCard!.email ?? '';
       _websiteController.text = widget.existingCard!.website ?? '';
       _addressController.text = widget.existingCard!.address ?? '';
     }
@@ -76,6 +74,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
     super.dispose();
   }
 
+  /// Save card to storage
   Future<void> _saveCard() async {
     final authState = context.read<AuthBloc>().state;
     String userId = authState is Authenticated
@@ -90,14 +89,11 @@ class _CardFormScreenState extends State<CardFormScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final fullName =
-          '${_firstNameController.text.trim()} ${_lastNameController.text.trim()}'
-              .trim();
-
       final card = BusinessCardModel(
         id: widget.existingCard?.id ?? const Uuid().v4(),
         userId: userId,
-        fullName: fullName,
+        firstName: _firstNameController.text.trim(),
+        secName: _lastNameController.text.trim(),
         companyName: _companyNameController.text.trim(),
         jobTitle: _jobTitleController.text.trim(),
         email: _emailController.text.trim(),
@@ -108,13 +104,12 @@ class _CardFormScreenState extends State<CardFormScreen> {
         address: _addressController.text.trim().isEmpty
             ? null
             : _addressController.text.trim(),
-        //   textColor: widget.imagePath,
         createdAt: widget.existingCard?.createdAt ?? DateTime.now(),
         textColor: currentTextColor,
         cardColor: currentBackgroundColor,
+        tabId: widget.existingCard?.tabId,
       );
-
-      if (widget.existingCard == null) {
+      if (!widget.isEdit) {
         context.read<CardsBloc>().add(AddCard(card));
       } else {
         context.read<CardsBloc>().add(UpdateCard(card));
@@ -135,22 +130,27 @@ class _CardFormScreenState extends State<CardFormScreen> {
   }
 
   @override
+  /// Build card form UI
   Widget build(BuildContext context) {
-    final isEditing = widget.existingCard != null;
+    final isEditing = widget.isEdit;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 24),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: AppColors.black,
+            size: 24,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           isEditing ? 'edit_card_title'.tr() : 'confirm_add_new_card'.tr(),
           style: const TextStyle(
-            color: Colors.black,
+            color: AppColors.black,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -176,7 +176,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 enabled: !_isSaving,
               ),
               const SizedBox(height: 16),
-
               DefaultTextField(
                 controller: _lastNameController,
                 label: 'second_name'.tr(),
@@ -185,7 +184,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 enabled: !_isSaving,
               ),
               const SizedBox(height: 16),
-
               DefaultTextField(
                 controller: _jobTitleController,
                 label: 'position'.tr(),
@@ -194,7 +192,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 enabled: !_isSaving,
               ),
               const SizedBox(height: 16),
-
               DefaultTextField(
                 controller: _companyNameController,
                 label: 'company_name'.tr(),
@@ -202,7 +199,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 validator: Validators.validateRequired,
                 enabled: !_isSaving,
               ),
-
+              const SizedBox(height: 16),
               DefaultTextField(
                 controller: _phoneController,
                 label: 'phone_number'.tr(),
@@ -212,7 +209,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 enabled: !_isSaving,
               ),
               const SizedBox(height: 16),
-
               DefaultTextField(
                 controller: _emailController,
                 label: 'email_address'.tr(),
@@ -222,7 +218,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 enabled: !_isSaving,
               ),
               const SizedBox(height: 16),
-
               DefaultTextField(
                 controller: _websiteController,
                 label: 'website'.tr(),
@@ -231,7 +226,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
                 enabled: !_isSaving,
               ),
               const SizedBox(height: 16),
-
               DefaultTextField(
                 controller: _addressController,
                 label: 'location'.tr(),
@@ -249,7 +243,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.textSecondary.withValues(alpha: 0.1),
+                      color: AppColors.textSecondary.withOpacity(0.1),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -289,8 +283,8 @@ class _CardFormScreenState extends State<CardFormScreen> {
                     child: ElevatedButton(
                       onPressed: _isSaving ? null : _saveCard,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4CAF50),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.cardBorderGreen,
+                        foregroundColor: AppColors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -307,7 +301,9 @@ class _CardFormScreenState extends State<CardFormScreen> {
                               ),
                             )
                           : Text(
-                              'add_new_card'.tr(),
+                              isEditing
+                                  ? 'save_card'.tr()
+                                  : 'add_new_card'.tr(),
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -326,6 +322,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
     );
   }
 
+  /// Build color selector widget
   Widget _buildColorSelector({
     required String title,
     required Color selectedColor,
@@ -343,7 +340,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
               title,
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: AppColors.black,
               ),
               textAlign: TextAlign.right,
             ),
@@ -354,7 +351,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
               decoration: BoxDecoration(
                 color: selectedColor,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                border: Border.all(color: AppColors.grey.withOpacity(0.3)),
               ),
             ),
             const SizedBox(height: 8),
@@ -364,6 +361,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
     );
   }
 
+  /// Change selected color
   void changeColor(Color currentColor, bool isBackground) {
     if (isBackground) {
       setState(() => backgroundPickerColor = currentColor);
@@ -372,6 +370,7 @@ class _CardFormScreenState extends State<CardFormScreen> {
     }
   }
 
+  /// Show color picker dialog
   showColorPicker(bool isBackground) => showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -381,25 +380,6 @@ class _CardFormScreenState extends State<CardFormScreen> {
           pickerColor: isBackground ? backgroundPickerColor : textPickerColor,
           onColorChanged: (newColor) => changeColor(newColor, isBackground),
         ),
-        // Use Material color picker:
-        //
-        // child: MaterialPicker(
-        //   pickerColor: pickerColor,
-        //   onColorChanged: changeColor,
-        //   showLabel: true, // only on portrait mode
-        // ),
-        //
-        // Use Block color picker:
-        //
-        // child: BlockPicker(
-        //   pickerColor: currentColor,
-        //   onColorChanged: changeColor,
-        // ),
-        //
-        // child: MultipleChoiceBlockPicker(
-        //   pickerColors: currentColors,
-        //   onColorsChanged: changeColors,
-        // ),
       ),
       actions: <Widget>[
         ElevatedButton(

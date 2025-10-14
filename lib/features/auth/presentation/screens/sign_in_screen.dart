@@ -11,7 +11,7 @@ import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 import 'sign_up_screen.dart';
 
-/// Sign In screen for user authentication
+/// Screen for user sign in
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -19,6 +19,7 @@ class SignInScreen extends StatefulWidget {
   State<SignInScreen> createState() => _SignInScreenState();
 }
 
+/// State for SignInScreen
 class _SignInScreenState extends State<SignInScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
@@ -49,14 +50,15 @@ class _SignInScreenState extends State<SignInScreen>
   }
 
   @override
+  /// Build sign in screen UI
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+  backgroundColor: AppColors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: Icon(Icons.close, color: AppColors.black),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -117,7 +119,7 @@ class _SignInScreenState extends State<SignInScreen>
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   
@@ -184,16 +186,17 @@ class _SignInScreenState extends State<SignInScreen>
     );
   }
 
+  /// Build logo widget
   Widget _buildLogo() {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 60),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.lightGrey,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

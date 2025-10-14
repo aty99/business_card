@@ -62,7 +62,7 @@ class _IntroScreenState extends State<IntroScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       body: SafeArea(
         child: Column(
           children: [
@@ -257,7 +257,7 @@ class _IntroScreenState extends State<IntroScreen>
               child: Text(
                 isLastPage ? 'get_started'.tr() : 'next'.tr(),
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.white,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),

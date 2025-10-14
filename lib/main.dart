@@ -11,22 +11,16 @@ import 'features/splash/presentation/screens/init_page.dart';
 import 'core/utils/app_colors.dart';
 import 'core/utils/image_storage.dart';
 
+/// App entry point
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
-  // Initialize Hive
   await Hive.initFlutter();
-
-  // Register Hive adapters
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(BusinessCardModelAdapter());
   Hive.registerAdapter(ColorAdapter());
-
-  // Initialize services via Injector
   await Injector().hiveDBService.init();
-
-  // Clean up any leftover temp files
   await ImageStorage.cleanupTempFiles();
 
   runApp(
@@ -39,10 +33,12 @@ void main() async {
   );
 }
 
+/// Main application widget
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
+  /// Build app UI and theme
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
@@ -65,12 +61,13 @@ class MyApp extends StatelessWidget {
               useMaterial3: true,
               primaryColor: AppColors.primary,
               scaffoldBackgroundColor: AppColors.background,
-              appBarTheme: const AppBarTheme(
+              appBarTheme: AppBarTheme(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.white,
                 elevation: 0,
               ),
               cardTheme: CardThemeData(
+                color: AppColors.cardBackground,
                 elevation: 2,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),

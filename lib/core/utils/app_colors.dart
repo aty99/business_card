@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 
 /// Application color scheme
 class AppColors {
+  // Extra colors for illustrations
+  static const Color pink = Color(0xFFE573A7); // Approximate pink.shade300
+
+  // Extra gradients for illustrations
+  static const Gradient introGradient = LinearGradient(
+    colors: [introGreen, introBlue],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
   // Primary colors
   static const Color primary = Color(0xFF26A69A); // Teal color from image
   static const Color primaryDark = Color(0xFF1E8B7F);
